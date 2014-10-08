@@ -1,4 +1,4 @@
 public interface ExpressionsBooleenne {
-    int evalue();
+    boolean evalue();
     void affiche();
 }
