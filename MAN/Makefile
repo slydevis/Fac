@@ -16,10 +16,10 @@ help ::
 all :: $(EXECS)
 
 $(EXECS) : %: %.o
-	$(CC) -o $@ $@.o
+	$(CC) -o $@.out $@.o
 
 clean ::
-	\rm -f *.o core
+	\rm -f *.o core && rm -f *out core
 
 distclean :: clean
 	\rm -f *% $(EXECS) $(EXECSUTIL) $(EXECSTIMER)

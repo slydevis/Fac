@@ -1,6 +1,8 @@
 #ifndef __NODE_H__
 #define __NODE_H__
 
+#include <string>
+
 class Node
 {
 private :
@@ -14,11 +16,12 @@ public :
     void setRightNode(Node* node);
     void setKey(unsigned key);
     void setH(unsigned h);
+    std::string toString() const;
     unsigned getKey() const;
     unsigned getH() const;
     Node* getLeftNode() const;
     Node* getRightNode() const;
-    void display() const;
+    int maxHeight(Node *p);
 };
 
 #endif /* __NODE_H__ */
