@@ -1,9 +1,23 @@
+// Tri insertion séquentielle ====> TP
+// Tri insertion dichotomique ====> TD
+// Tri par sélection permutation ====> Cours
+// Tri à bulles ====> Cours
+// Tri par fusion ====> Cours + TD
+// Tri rapide ====> Cours + TD2
+// Tri avec ABR ====> ....
+// Tri par tas ====> TD3
+// Tri par insertion séquentielle avec liste chaînées ====> VOUS
+// Tri par base ====> VOUS
+// Tri à casiers ====> VOUS
+// Tri par adressage direct ====> VOUS + COURS
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 // Différents algorithmes de tri
 
+#include "Util.h"
 #include "bubbleSort.h"
 #include "quickSort.h"
 #include "mergeSort.h"
@@ -33,24 +47,24 @@ void lancerTri(void (*functor)(int*, int), int size)
         for(int i = 0; i < size; ++i)
             t[i] = (int) rand()%100;
 
-		int nbToShow = 0;
+//		int nbToShow = 0;
 		
-		if(size > MAX)
-			nbToShow = MAX;
-		else
-			nbToShow = size;
+//		if(size > MAX)
+//			nbToShow = MAX;
+//		else
+//			nbToShow = size;
 		
-        printf("\nAvant tri : \n\n");
+//        printf("\nAvant tri : \n\n");
 
-         for(int i = 0; i < nbToShow; ++i)
-             printf("TAB[%d] = %d\n", i, t[i]);
+//         for(int i = 0; i < nbToShow; ++i)
+//             printf("TAB[%d] = %d\n", i, t[i]);
 
         (*functor)(t, size);
 
-         printf("\nAprès le tri : \n\n");
+//         printf("\nAprès le tri : \n\n");
 
-		for(int i = 0; i < nbToShow; ++i)
-			printf("TAB[%d] = %d\n", i, t[i]);
+//		for(int i = 0; i < nbToShow; ++i)
+//			printf("TAB[%d] = %d\n", i, t[i]);
         
 		
 		fin = clock();
@@ -62,6 +76,8 @@ void lancerTri(void (*functor)(int*, int), int size)
 		
 		printf(" ======> Temps d'execution = %f ms\n", (fin - debut)*1.0/CLOCKS_PER_SEC);
 
+        // Crée le fichier de sortie pour l'analyse du temps d'éxecution
+
 		FILE* fichier = NULL;
 	 
 		fichier = fopen("resultat.csv", "w");
@@ -72,7 +88,8 @@ void lancerTri(void (*functor)(int*, int), int size)
 			fclose(fichier);
 		}
 		 
- 
+        // On vérifie si le tableau est bien trié
+        
 		for(int i = 0; i < size - 1; ++i)
 		{
 			if(t[i] > t[i + 1])
@@ -87,6 +104,7 @@ void lancerTri(void (*functor)(int*, int), int size)
 int main(int argc, char* argv[]) {
 	
 	(void) argv;
+
 	if(argc > 1)
 	{
 		printf("Erreur trop d'argument\n");

@@ -39,45 +39,42 @@ void mergedSort(int* arr, int l, int h) {
 
 	pivot  = (l + h) / 2;
 
-mergedSort(arr, l, pivot);
-mergedSort(arr, pivot + 1, h);
+    mergedSort(arr, l, pivot);
+    mergedSort(arr, pivot + 1, h);
 
-for(i = 0; i < length; i++)
-{
-temp[i] = arr[l + i];
-}
+    for(i = 0; i < length; i++)
+    {
+        temp[i] = arr[l + i];
+    }
 
-merge1 = 0;
-merge2 = pivot - l + 1;
+    merge1 = 0;
+    merge2 = pivot - l + 1;
 
-for(i = 0; i < length; i++) 
-{
-if(merge2 <= h - l)
-{
-if(merge1 <= pivot - l)
-{
-if(temp[merge1] > temp[merge2])
-{
- arr[i + l] = temp[merge2++];
-}
-
-else
-{
- arr[i + l] = temp[merge1++];
-}
-}
-
-else
-{
-arr[i + l] = temp[merge2++];
-}
-}
-
-else
-{
-arr[i + l] = temp[merge1++];
-}
-}
+    for(i = 0; i < length; i++) 
+    {
+        if(merge2 <= h - l)
+        {
+            if(merge1 <= pivot - l)
+            {
+                if(temp[merge1] > temp[merge2])
+                {
+                     arr[i + l] = temp[merge2++];
+                }
+                else
+                {
+                    arr[i + l] = temp[merge1++];
+                }
+            }
+            else
+            {
+                arr[i + l] = temp[merge2++];
+            }
+        }
+        else
+        {
+            arr[i + l] = temp[merge1++];
+        }
+    }
 }
 
 void mergeSort(int* tab, int size) {

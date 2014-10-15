@@ -6,12 +6,16 @@ CFLAGS = -Wall -W -std=c99 -pedantic
 # Si une ligne est pleine, rajouter '\' en fin de ligne et passer a la suivante.
 
 EXECS = main
+LIBS =
 
 .c.o :
 	$(CC) -c $(CFLAGS) $*.c
 
 help ::
 	@echo "Options du make : help all clean distclean"
+
+.h.o :
+	$(CC) -c $(CFLAGS) $*.h
 
 all :: $(EXECS)
 

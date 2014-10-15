@@ -2,6 +2,9 @@
 
 int main(int argc, char* argv[])
 {
+    (void) argc;
+    (void) argv;
+
     char buff[200];
     int p1[2];
     int p2[2];

@@ -17,12 +17,12 @@ void bubbleSort(int* tab, int size) {
 			  {
 				  echange_effectue = 1;
 
-				  //swap(&tab[j], &tab[j+1]);
+				  swap(&tab[j], &tab[j+1]);
 				  
-				  int buff;
+				  /* int buff;
 				  buff = tab[j];
 				  tab[j] = tab[j+1];
-				  tab[j + 1] = buff; 
+				  tab[j + 1] = buff; */ 
 			  }
 		   }
 		   size = size - 1;

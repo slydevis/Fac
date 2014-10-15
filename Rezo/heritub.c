@@ -4,6 +4,9 @@
 
 int main(int argc, char* argv[])
 {
+    (void) argc;
+    (void) argv;
+
     char buff[11];
     int p[2];
     ssize_t r;
