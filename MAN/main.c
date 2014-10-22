@@ -17,7 +17,6 @@
 
 // Différents algorithmes de tri
 
-#include "Util.h"
 #include "bubbleSort.h"
 #include "quickSort.h"
 #include "mergeSort.h"
@@ -25,24 +24,27 @@
 #include "selectSort.h"
 
 #define MAX 10 // Nombre de case à afficher afin de vérifier les algorithmes
+#define MAX_TIME 5.0 /*5.00000 * 60*/
 
 void (*functor)(int* tab, int size);
 
 int NbCase[] = { 1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000, 5000000, 10000000, 50000000, 100000000, 500000000};
 
-void lancerTri(void (*functor)(int*, int), int size)
+char* currentSort =  "";
+
+int lancerTri(void (*functor)(int*, int), int size)
 {
     int *t = (int*) malloc(size * sizeof(int)); // Déclaration d'un tableau dynamique
 
     clock_t debut, fin/*, timer*/;
-
+			
     srand(time(0));
         
     for(unsigned i = 0; i < 20; ++i)
     {
 		debut = clock();
 		
-		printf("Test = %d, Size = %d", i + 1, size);
+		printf("Algo %s : Test = %d, Size = %d", currentSort, i + 1, size);
 
         for(int i = 0; i < size; ++i)
             t[i] = (int) rand()%100;
@@ -69,22 +71,24 @@ void lancerTri(void (*functor)(int*, int), int size)
 		
 		fin = clock();
 		
-		if(((fin - debut)*1.0/CLOCKS_PER_SEC) > 5.00000 * 60) {
-			printf(" ======> Erreur temps d'execution trop long (%f)\n", (fin - debut)*1.0/CLOCKS_PER_SEC);
-			exit(1);
+		float time = (fin - debut)*1.0/CLOCKS_PER_SEC;
+		
+		if(time > MAX_TIME) {
+			printf(" ======> Erreur temps d'execution trop long (%f)\n", time);
+			return -1;
 		}
 		
-		printf(" ======> Temps d'execution = %f ms\n", (fin - debut)*1.0/CLOCKS_PER_SEC);
+		printf(" ======> Temps d'execution = %f ms\n", time);
 
         // Crée le fichier de sortie pour l'analyse du temps d'éxecution
 
 		FILE* fichier = NULL;
 	 
-		fichier = fopen("resultat.csv", "w");
-	 
+		fichier = fopen("resultat.csv", "a");
+	
 		if (fichier != NULL)
 		{
-			fputs("%d", fichier);
+			fprintf(fichier, "%s;%d;%d\n", currentSort, i + 1, size);
 			fclose(fichier);
 		}
 		 
@@ -97,8 +101,59 @@ void lancerTri(void (*functor)(int*, int), int size)
 				printf(" ======> Erreur tableau non trié\n");
 				exit(1);
 			}
-		}	
+		}		
+    }    
+	return 0;	
+}
+
+void selectSort(int choix)
+{
+	switch(choix)
+    {
+        case 1:
+        case 2:
+			printf("\n-----> Fonction non implémenté\n\n");
+			return;
+            break;
+		case 3:
+			printf("\n-----> Fonction non implémenté\n\n");
+			//tri = &selectSort;
+			return;
+			break;
+        case 4:
+			printf("\n-----> Bubble Sort\n\n");
+            functor = &bubbleSort;
+            currentSort = "BubbleSort";
+            break;
+        case 5:
+			printf("\n-----> Merge Sort\n\n");
+            //functor = &mergeSort; // TODO : Résoudre l'erreur de segmentation
+			currentSort = "Merge Sort";
+            return;
+            break;
+        case 6:
+			printf("\n-----> Quick Sort\n\n");
+            functor = &quickSort;
+            currentSort = "Quick Sort";
+            break;
+        case 7:
+			printf("\n-----> Fonction non implémenté\n\n");
+			return;
+            break;
+		case 8:
+			printf("\n-----> Heap Sort\n\n");
+			// currentSort = "Heap Sort";
+			// functor = &heapSort;
+			break;
+        default:
+            printf("\nValeur incorrect\n\n");
+            return;
+        break;
     }
+
+	int k = 0;
+    for(unsigned i = 0; (i < sizeof(NbCase)/sizeof(NbCase[0])) && k == 0; ++i)
+        k = lancerTri(functor, NbCase[i]);
 }
 
 int main(int argc, char* argv[]) {
@@ -123,52 +178,16 @@ int main(int argc, char* argv[]) {
     printf("6 - Tri rapide (Quicksort)\n");
     printf("7 - Tri à l'aide d'arbres binaires de recherche\n");
     printf("8 - Tri par tas (Heapsort)\n");
+    printf("9 - Tous les tris à la suite\n");
     printf("\nVotre choix ? ");
     scanf("%d", &choix);
     printf("\n------------------------------\n");
 
-    switch(choix)
-    {
-        case 0:
-        case 1:
-        case 2:
-			printf("\n-----> Fonction non implémenté\n\n");
-			return 1;
-            break;
-		case 3:
-			printf("\n-----> Fonction non implémenté\n\n");
-			//tri = &selectSort;
-			return 1;
-			break;
-        case 4:
-			printf("\n-----> Bubble Sort\n\n");
-            functor = &bubbleSort;
-            break;
-        case 5:
-			printf("\n-----> Merge Sort\n\n");
-            //functor = &mergeSort; // TODO : Résoudre l'erreur de segmentation
-            return 1;
-            break;
-        case 6:
-			printf("\n-----> Quick Sort\n\n");
-            functor = &quickSort;
-            break;
-        case 7:
-			printf("\n-----> Fonction non implémenté\n\n");
-			return 1;
-            break;
-		case 8:
-			printf("\n-----> Heap Sort\n\n");
-			functor = &heapSort;
-			break;
-        default:
-            printf("\nValeur incorrect\n\n");
-            return 1;
-        break;
-    }
+	if(choix == 9)
+		for(int i = 1; i < 9; ++i)
+			selectSort(i);
 
-    for(unsigned i = 0; i < sizeof(NbCase)/sizeof(NbCase[0]); ++i)
-        lancerTri(functor, NbCase[i]);
+	selectSort(choix);
 
     return 0;
 }

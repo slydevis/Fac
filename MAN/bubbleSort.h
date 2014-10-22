@@ -1,12 +1,8 @@
 #ifndef __BUBBLESORT_H__
 #define __BUBBLESORT_H__
 
-#include "Util.h"
-
-// TODO : Optimiser
-
-void bubbleSort(int* tab, int size) {
-
+void bubbleSort(int* tab, int size)
+{
 	  int echange_effectue;
 	  do
 	  {
@@ -17,17 +13,17 @@ void bubbleSort(int* tab, int size) {
 			  {
 				  echange_effectue = 1;
 
-				  swap(&tab[j], &tab[j+1]);
+				  // swap(&tab[j], &tab[j+1]);
 				  
-				  /* int buff;
+				  int buff;
 				  buff = tab[j];
 				  tab[j] = tab[j+1];
-				  tab[j + 1] = buff; */ 
+				  tab[j + 1] = buff; 
 			  }
 		   }
 		   size = size - 1;
        }
-       while (echange_effectue == 1);
+       while (echange_effectue == 1);       
 }
 
 #endif // __BUBBLESORT_H__

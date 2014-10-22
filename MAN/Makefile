@@ -23,7 +23,7 @@ $(EXECS) : %: %.o
 	$(CC) -o $@.out $@.o
 
 clean ::
-	\rm -f *.o core && rm -f *out core
+	\rm -f *.o core && rm -f *out core && rm -f *.csv
 
 distclean :: clean
 	\rm -f *% $(EXECS) $(EXECSUTIL) $(EXECSTIMER)

@@ -7,10 +7,17 @@
 class AVLTree
 {
 private :
-    std::vector<Node> m_tabNode;
+    void swapinessNode(Node * currentNode);
 public :
-    void add(Node node);
+    Node* m_root;
+
+    AVLTree();
+    void add(unsigned key);
+    void add(Node* node);
+    void deleteNode(unsigned key);
     void display() const;
     std::string toString() const;
+    void balanceTree(Node* currentNode);
+
 };
 #endif /* __AVL_H__ */

@@ -12,6 +12,7 @@ private :
     Node* m_rightNode;
 public :
     Node();
+    Node(unsigned key);
     void setLeftNode(Node* node);
     void setRightNode(Node* node);
     void setKey(unsigned key);
@@ -21,7 +22,8 @@ public :
     unsigned getH() const;
     Node* getLeftNode() const;
     Node* getRightNode() const;
-    int maxHeight(Node *p);
+    static int maxHeight(Node *p);
+    static void display(Node *root, int level, int indentSpace);
 };
 
 #endif /* __NODE_H__ */
