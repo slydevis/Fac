@@ -14,7 +14,7 @@ LIBS   =
 EXECS = 
 
 # pour compiler avec bor-util.c
-EXECSUTIL = heritub redir2tub debitntub mEtMme-cli date-ser date-cli nhello-cli nhello-ser nhello-ser2
+EXECSUTIL = heritub redir2tub debitntub mEtMme-cli date-ser date-cli nhello-cli nhello-ser nhello-ser2 daytime defrag aspiweb
 
 # pour compiler avec bor-util.c et bor-timer.c
 EXECSTIMER = 

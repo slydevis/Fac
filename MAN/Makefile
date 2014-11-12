@@ -17,7 +17,12 @@ help ::
 .h.o :
 	$(CC) -c $(CFLAGS) $*.h
 
+all :: clean
 all :: $(EXECS)
+
+debug : clean
+debug : CFLAGS += -DDEBUG
+debug : $(EXECS)
 
 $(EXECS) : %: %.o
 	$(CC) -o $@.out $@.o

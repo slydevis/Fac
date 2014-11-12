@@ -13,6 +13,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h> // sleep()
+#include <string.h> // strcmp()
 #include <time.h>
 
 // Différents algorithmes de tri
@@ -49,26 +51,27 @@ int lancerTri(void (*functor)(int*, int), int size)
         for(int i = 0; i < size; ++i)
             t[i] = (int) rand()%100;
 
-//		int nbToShow = 0;
+#ifdef DEBUG
+		int nbToShow = 0;
 		
-//		if(size > MAX)
-//			nbToShow = MAX;
-//		else
-//			nbToShow = size;
+		if(size > MAX)
+			nbToShow = MAX;
+		else
+			nbToShow = size;
 		
-//        printf("\nAvant tri : \n\n");
+        printf("\nAvant tri : \n\n");
 
-//         for(int i = 0; i < nbToShow; ++i)
-//             printf("TAB[%d] = %d\n", i, t[i]);
-
+         for(int i = 0; i < nbToShow; ++i)
+             printf("TAB[%d] = %d\n", i, t[i]);
+#endif
         (*functor)(t, size);
+#ifdef DEBUG
+         printf("\nAprès le tri : \n\n");
 
-//         printf("\nAprès le tri : \n\n");
-
-//		for(int i = 0; i < nbToShow; ++i)
-//			printf("TAB[%d] = %d\n", i, t[i]);
-        
-		
+		for(int i = 0; i < nbToShow; ++i)
+			printf("TAB[%d] = %d\n", i, t[i]);
+		sleep(2);
+#endif		
 		fin = clock();
 		
 		float time = (fin - debut)*1.0/CLOCKS_PER_SEC;
@@ -80,7 +83,7 @@ int lancerTri(void (*functor)(int*, int), int size)
 		
 		printf(" ======> Temps d'execution = %f ms\n", time);
 
-        // Crée le fichier de sortie pour l'analyse du temps d'éxecution
+        // Crée le fichier de sortie pour l'analyse du temps d'éxecution celons l'algorithme
 
 		FILE* fichier = NULL;
 	 
@@ -92,13 +95,13 @@ int lancerTri(void (*functor)(int*, int), int size)
 			fclose(fichier);
 		}
 		 
-        // On vérifie si le tableau est bien trié
+        // On vérifie si le tableau est bien trié si c'est pas le cas on ferme le programme
         
 		for(int i = 0; i < size - 1; ++i)
 		{
 			if(t[i] > t[i + 1])
 			{
-				printf(" ======> Erreur tableau non trié\n");
+				printf(" ======> Erreur fatale : tableau non trié\n");
 				exit(1);
 			}
 		}		
@@ -162,7 +165,7 @@ int main(int argc, char* argv[]) {
 
 	if(argc > 1)
 	{
-		printf("Erreur trop d'argument\n");
+		printf("Nombre d'argument invalide\n");
 		return 1;
 	}
 	

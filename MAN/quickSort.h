@@ -9,7 +9,9 @@ void quickSortRec(int* arr, int left, int right) {
       int i = left, j = right;
       int tmp;
       int pivot = arr[(left + right) / 2];
+      
       /* partition */
+      
       while (i <= j) {
             while (arr[i] < pivot)
                   i++;

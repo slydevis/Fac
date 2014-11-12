@@ -1,8 +1,112 @@
 #include <iostream>
-#include "Node.h"
+#include <cstdlib> // system()
+#include <fstream> // ofstream
+
 #include "AVL.h"
 
 using namespace std;
+
+string outputFileName = "result";
+
+void unbalancedRight(AVLTree &avl ) // Ok
+{
+/*         |-----5-----|
+*      |---3---|       7
+* |----2       4
+* 1
+*/
+    avl.clear();
+    avl.add( 5 );
+    avl.add( 3 );
+    avl.add( 7 );
+    avl.add( 2 );
+    avl.add( 4 );
+    avl.add( 1 );
+}
+
+//void unbalancedRightIntern( TreeAVL<int> & avl )
+//{
+///* |-------10------|
+//* |-------5-------| 15
+//* 1 |---7
+//* 6
+//*/
+//avl.clear();
+//avl.insert( 10 );
+//avl.insert( 5 );
+//avl.insert( 15 );
+//avl.insert( 1 );
+//avl.insert( 7 );
+//avl.insert( 6 );
+//}
+//void unbalancedRight2( TreeAVL<int> & avl )
+//{
+///* |---5---|
+//* |---3 9
+//* |----2
+//* 1
+//*/
+//avl.clear();
+//avl.insert( 5 );
+//avl.insert( 3 );
+//avl.insert( 9 );
+//avl.insert( 2 );
+//avl.insert( 1 );
+//}
+
+// Pas ok
+void unbalancedLeft(AVLTree &avl)
+{
+    avl.clear();
+    avl.add(5);
+    avl.add(3);
+    avl.add(7);
+    avl.add(8);
+    avl.add(9);
+}
+
+//void unbalancedLeftIntern( TreeAVL<int> & avl )
+//{
+///* |-------10------|
+//* 5 |----15----|
+//* |--12 20
+//* 11
+//*/
+//avl.clear();
+//avl.insert( 10 );
+//avl.insert( 5 );
+//avl.insert( 15 );
+//avl.insert( 12 );
+//avl.insert( 20 );
+//avl.insert( 11 );
+//}
+//void randomFill( int nb, int min, int max, TreeAVL<int> & avl )
+//{
+//avl.clear();
+//srand( time( NULL ) );
+//int a = 0;
+//for( int i = 0; i < nb; ++i )
+//{
+//a = rand()%(max-min) + min;
+//avl.insert( a );
+//}
+//}
+
+
+void outputResult(AVLTree tree) {
+
+    string fileName = outputFileName + ".dot";
+    ofstream os(fileName.c_str(), ios::out);
+
+    os << "digraph G { " << "\n";
+    os << tree.toString();
+    os << "\n}";
+
+    os.close();
+
+    string command = "dot -Tpdf " + outputFileName + ".dot -o " + outputFileName + ".pdf";
+    system(command.c_str());
+}
 
 int main() {
 
@@ -43,30 +147,52 @@ int main() {
 
     treeTest.display();*/
 
-/*
- * Résultat à avoir pour le réequilibrage
-
-* 		_44_
-       /    \
-  	  32     51
- */
     AVLTree tree;
 
     tree.add(51);
     tree.add(44);
     tree.add(32);
-/*    tree.add(26);
+
+//    std::cout << tree.isBalance() << std::endl;
+
+    tree.add(26);
+
+//    std::cout << tree.isBalance() << std::endl;
+
     tree.add(17);
+
+//    std::cout << tree.isBalance() << std::endl;
+
     tree.add(59);
+
+//    std::cout << tree.isBalance() << std::endl;
+
     tree.add(23);
+
+ //   std::cout << tree.isBalance() << std::endl;
+
     tree.add(21);
-    tree.add(24); */
 
-    tree.balanceTree(tree.m_root);
+//    std::cout << tree.isBalance() << std::endl;
+
+    tree.add(24);
+
+    //std::cout << "Unbalanced Right Test : " << std::endl;
+
+    //unbalancedRight(tree);
     tree.display();
-//    tree.deleteNode(26);
-//	tree.deleteNode(44);
 
-	std::cout << " \nFin !!" << std::endl;
+    //std::cout << "Unbalanced Left Test : " << std::endl;
+
+    //unbalancedLeft(tree);
+    // tree.display();
+
+    // tree.balanceTree(tree.m_root);
+
+//  tree.deleteNode(26);
+//  tree.deleteNode(44);
+
+    outputResult(tree);
+
     return 0;
 }

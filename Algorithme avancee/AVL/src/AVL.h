@@ -7,17 +7,22 @@
 class AVLTree
 {
 private :
-    void swapinessNode(Node * currentNode);
+    bool isBalanceRec(Node* currentNode) const;
 public :
     Node* m_root;
 
     AVLTree();
     void add(unsigned key);
     void add(Node* node);
+    bool contain(unsigned key) const;
+    void clear();
     void deleteNode(unsigned key);
     void display() const;
+    void updateH();
     std::string toString() const;
     void balanceTree(Node* currentNode);
-
+    void leftRotation(Node* currentNode);
+    void rightRotation(Node* currentNode);
+    bool isBalance() const;
 };
 #endif /* __AVL_H__ */

@@ -15,6 +15,7 @@ Node::Node()
     this->m_h = 0;
     this->m_leftNode = NULL;
     this->m_rightNode = NULL;
+    this->m_parent = NULL;
 }
 
 Node::Node(unsigned key)
@@ -23,7 +24,46 @@ Node::Node(unsigned key)
 	this->m_h = 0;
 	this->m_leftNode = NULL;
 	this->m_rightNode = NULL;
+	this->m_parent = NULL;
 }
+
+Node* Node::getParent() const
+{
+    return this->m_parent;
+}
+
+void Node::setParent(Node* node)
+{
+    m_parent = node;
+}
+
+void Node::updateH()
+{
+    int HLeft = 0;
+    int HRight = 0;
+
+    if(m_leftNode != NULL)
+        HLeft = m_leftNode->getH();
+
+    if(m_rightNode != NULL)
+        HRight = m_rightNode->getH();
+
+    if(HRight > HLeft)
+        m_h = HRight + 1;
+    else
+        m_h = HLeft + 1;
+
+    if(m_parent != NULL)
+        m_parent->updateH();
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -171,13 +211,22 @@ std::string Node::toString() const
 {
     std::ostringstream os;
 
-    os 		<< "\n" << "Node : " << "{ m_key = "
-    		<< m_key << ", m_h = " << m_h  << "}";
+    os << m_key << "[label=\"" << m_key << " (" << m_h << ")\"]" << std::endl;
 
-    if(m_leftNode != NULL)
-    	os << "\nLeft Node : " << m_leftNode->toString();
-    if(m_rightNode != NULL)
-    	os << "\nRight Node : " << m_rightNode->toString();
+    if(m_leftNode == NULL && m_rightNode == NULL )
+        return "";
+
+    if(m_leftNode != NULL )
+    {
+        os << m_key << " -> " << m_leftNode->m_key << ";" << std::endl;
+        os << m_leftNode->toString();
+    }
+
+    if(m_rightNode != NULL )
+    {
+        os << m_key << " -> " << m_rightNode->m_key << ";" << std::endl;
+        os << m_rightNode->toString();
+    }
 
     return os.str();
 }
