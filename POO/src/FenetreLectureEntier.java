@@ -16,7 +16,7 @@ public class FenetreLectureEntier extends JFrame{
     private JLabel label = new JLabel("Une ComboBox");
     private JPanel container = new JPanel();
     private JTextField jtf = new JTextField("0");
-
+    public boolean isActive = false;
     public FenetreLectureEntier()
     {
         this.setTitle("Animation");
@@ -32,6 +32,7 @@ public class FenetreLectureEntier extends JFrame{
         top.add(label);
         top.add(jtf);
         container.add(top, BorderLayout.NORTH);
+        isActive = true;
         this.setContentPane(container);
         this.setVisible(true);
         this.pack();
@@ -39,7 +40,15 @@ public class FenetreLectureEntier extends JFrame{
 
     public void openPopup()
     {
+        isActive = false;
+        this.setVisible(false);
+        this.dispose();
         JOptionPane.showMessageDialog(this,"Bravo tu as choisi : " + nbChoise);
+    }
+
+    public int getNb()
+    {
+        return this.nbChoise;
     }
 
     class ClavierListener implements KeyListener{
