@@ -1,15 +1,8 @@
-// Tri insertion séquentielle ====> TP
-// Tri insertion dichotomique ====> TD
-// Tri par sélection permutation ====> Cours
-// Tri à bulles ====> Cours
-// Tri par fusion ====> Cours + TD
-// Tri rapide ====> Cours + TD2
-// Tri avec ABR ====> ....
-// Tri par tas ====> TD3
-// Tri par insertion séquentielle avec liste chaînées ====> VOUS
-// Tri par base ====> VOUS
-// Tri à casiers ====> VOUS
-// Tri par adressage direct ====> VOUS + COURS
+// Tri avec ABR ====> TODO
+// Tri par tas ====> TD3 TODO
+// Tri par insertion séquentielle avec liste chaînées ====> VOUS TODO
+// Tri à casiers ====> VOUS TODO
+// Tri par adressage direct ====> VOUS + COURS TODO
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,11 +15,22 @@
 #include "bubbleSort.h"
 #include "quickSort.h"
 #include "mergeSort.h"
+#include "selectPermSort.h"
+#include "insertSeq.h"
+#include "insertDico.h"
+#include "radixSort.h"
+#include "ABRSort.h"
 #include "heapSort.h"
-#include "selectSort.h"
 
-#define MAX 10 // Nombre de case à afficher afin de vérifier les algorithmes
-#define MAX_TIME 5.0 /*5.00000 * 60*/
+#define MAX 10
+
+#define NOM_FIC "resultat.csv"
+
+#ifdef DEBUG
+	#define MAX_TIME 5.0
+#else
+	#define MAX_TIME 5.0 * 60
+#endif
 
 void (*functor)(int* tab, int size);
 
@@ -35,13 +39,27 @@ int NbCase[] = { 1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000, 50000
 char* currentSort =  "";
 
 int lancerTri(void (*functor)(int*, int), int size)
+/* 
+ * Génère un tableau aléatoirement et execute un tri 
+ * 20 fois et sauvegarde les résultats dans le fichier de sortie 
+ */
 {
-    int *t = (int*) malloc(size * sizeof(int)); // Déclaration d'un tableau dynamique
+	int *t = (int*) malloc(size * sizeof(int)); // Déclaration d'un tableau dynamique
 
-    clock_t debut, fin/*, timer*/;
+    clock_t debut, fin;
 			
     srand(time(0));
-        
+
+	FILE* fichier = NULL;
+ 
+	fichier = fopen(NOM_FIC, "a+");
+	
+	if (fichier != NULL)
+	{
+		fprintf(fichier, "%s;%d;", currentSort, size);
+		fclose(fichier);
+	}
+		
     for(unsigned i = 0; i < 20; ++i)
     {
 		debut = clock();
@@ -81,21 +99,19 @@ int lancerTri(void (*functor)(int*, int), int size)
 			return -1;
 		}
 		
-		printf(" ======> Temps d'execution = %f ms\n", time);
+		printf(" ======> Temps d'execution = %f sec.\n", time);
 
         // Crée le fichier de sortie pour l'analyse du temps d'éxecution celons l'algorithme
-
-		FILE* fichier = NULL;
 	 
-		fichier = fopen("resultat.csv", "a");
-	
+		fichier = fopen(NOM_FIC, "a+");
+		
 		if (fichier != NULL)
 		{
-			fprintf(fichier, "%s;%d;%d\n", currentSort, i + 1, size);
+			fprintf(fichier, "%f;", time);
 			fclose(fichier);
 		}
 		 
-        // On vérifie si le tableau est bien trié si c'est pas le cas on ferme le programme
+        // On vérifie si le tableau est bien trié, sinon erreur fatale
         
 		for(int i = 0; i < size - 1; ++i)
 		{
@@ -105,48 +121,89 @@ int lancerTri(void (*functor)(int*, int), int size)
 				exit(1);
 			}
 		}		
-    }    
+    }
+    
+	fichier = fopen(NOM_FIC, "a+");
+	
+	if (fichier != NULL)
+	{
+		fprintf(fichier, "\n");
+		fclose(fichier);
+	}
+	
+	free(t);
+	
 	return 0;	
 }
 
 void selectSort(int choix)
+/* 
+ * Choisi le tri adapté celon le choix de l'utilisateur 
+ * et lance les tris celons le nombre de taille différente choisi
+ * dans le tableau NbCase 
+ */
 {
 	switch(choix)
     {
         case 1:
+			printf("\n-----> Insertion séquentielle\n\n");
+			functor = &insertSeq; // OK
+			currentSort = "Insertion séquentielle";
+			break;
         case 2:
-			printf("\n-----> Fonction non implémenté\n\n");
-			return;
+			printf("\n-----> Insertion dichotomique\n\n");
+			functor = &insertDico; // OK
+			currentSort = "Insertion dichotomique";
             break;
 		case 3:
-			printf("\n-----> Fonction non implémenté\n\n");
-			//tri = &selectSort;
-			return;
+			printf("\n-----> Selection-permutation\n\n");
+			functor = &selectPermSort; // OK
+			currentSort = "Selection-permutation";
 			break;
         case 4:
 			printf("\n-----> Bubble Sort\n\n");
-            functor = &bubbleSort;
+            functor = &bubbleSort; // OK
             currentSort = "BubbleSort";
             break;
         case 5:
 			printf("\n-----> Merge Sort\n\n");
-            //functor = &mergeSort; // TODO : Résoudre l'erreur de segmentation
+            functor = &mergeSort; // OK
 			currentSort = "Merge Sort";
-            return;
             break;
         case 6:
 			printf("\n-----> Quick Sort\n\n");
-            functor = &quickSort;
+            functor = &quickSort; // OK
             currentSort = "Quick Sort";
             break;
         case 7:
-			printf("\n-----> Fonction non implémenté\n\n");
-			return;
+			printf("\n-----> Tri avec ABR\n\n");
+			functor = &ABRSort;
+			currentSort = "Tri ABR"; // TODO
             break;
 		case 8:
 			printf("\n-----> Heap Sort\n\n");
-			// currentSort = "Heap Sort";
-			// functor = &heapSort;
+			currentSort = "Heap Sort"; // TODO
+			functor = &heapSort;
+			return;
+			break;
+		case 9:
+			printf("\n-----> Tri par insertion séquentielle avec liste chaînées\n\n");
+			return;
+			break;
+		case 10:
+			printf("\n-----> Tri par base\n\n");
+			functor = &radixSort;
+			currentSort = "Tri par base"; // OK
+			break;
+		case 11:
+			printf("\n-----> Tri à casiers\n\n");
+			// Pas trouvé d'information sur ce tri donc non fait
+			return;
+			break;
+		case 12:
+			printf("\n-----> Tri par adressage direct\n\n");
+			// Pas trouvé d'information sur ce tri donc non fait
+			return;
 			break;
         default:
             printf("\nValeur incorrect\n\n");
@@ -156,7 +213,13 @@ void selectSort(int choix)
 
 	int k = 0;
     for(unsigned i = 0; (i < sizeof(NbCase)/sizeof(NbCase[0])) && k == 0; ++i)
+    {
+		#ifdef DEBUG
+			if(NbCase[i] == NbCase[0])
+				continue;
+		#endif
         k = lancerTri(functor, NbCase[i]);
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -169,25 +232,31 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 	
+	remove(NOM_FIC);
+
     int choix;
 
     printf("----- Complexité des tris ------");
     printf("\n\nMenu :\n");
-    printf("1 - Tri par insertion séquentielle\n");
-    printf("2 - Tri par insertion dichotomique\n");
-    printf("3 - Tri par selection-permutation\n");
-    printf("4 - Tri à bulles\n");
-    printf("5 - Tri par fusion\n");
-    printf("6 - Tri rapide (Quicksort)\n");
-    printf("7 - Tri à l'aide d'arbres binaires de recherche\n");
-    printf("8 - Tri par tas (Heapsort)\n");
-    printf("9 - Tous les tris à la suite\n");
+    printf(" 1 - Tri par insertion séquentielle\n");
+    printf(" 2 - Tri par insertion dichotomique\n");
+    printf(" 3 - Tri par selection-permutation\n");
+    printf(" 4 - Tri à bulles\n");
+    printf(" 5 - Tri par fusion\n");
+    printf(" 6 - Tri rapide (Quicksort)\n");
+    printf(" 7 - Tri à l'aide d'arbres binaires de recherche\n");
+    printf(" 8 - Tri par tas (Heapsort)\n");
+    printf(" 9 - Tri par insertion séquentielle avec liste chaînées\n");
+    printf("10 - Tri par base\n");
+    printf("11 - Tri à casiers\n");
+    printf("12 - Tri par adressage direct\n");
+    printf("13 - Tous les tris à la suite\n");
     printf("\nVotre choix ? ");
     scanf("%d", &choix);
     printf("\n------------------------------\n");
 
-	if(choix == 9)
-		for(int i = 1; i < 9; ++i)
+	if(choix == 13)
+		for(int i = 1; i < 13; ++i)
 			selectSort(i);
 
 	selectSort(choix);

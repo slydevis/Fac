@@ -1,42 +1,53 @@
 #ifndef __QUICKSORT_H__
 #define __QUICKSORT_H__
 
-#include "Util.h"
+void echanger(int* t, int p, int i)
+/* 
+ * Permet d'échanger deux case d'un tableau entre elles 
+ */
+{
+	int tmp = t[p];
+	t[p] = t[i];
+	t[i] = tmp;
+}
 
-// TODO : Optimiser et Personnalisé
+void quickSortRec(int* tab, int g, int d)
+/* 
+ * Execute l'algorithme du Quick sort pour trier un tableau 
+ * tab[g...d] non trié 
+ */
+{
+    int gauche = g-1;
+    int droite = d+1;
+    const int pivot = tab[g];
+	
+	if(g >= d)
+        return;
+        
+    // On sélectionne notre pivot
+    
+    while(1)
+    {
+        do droite--; while(tab[droite] > pivot);
+        do gauche++; while(tab[gauche] < pivot);
 
-void quickSortRec(int* arr, int left, int right) {
-      int i = left, j = right;
-      int tmp;
-      int pivot = arr[(left + right) / 2];
-      
-      /* partition */
-      
-      while (i <= j) {
-            while (arr[i] < pivot)
-                  i++;
-            while (arr[j] > pivot)
-                  j--;
-            if (i <= j) {
-                  tmp = arr[i];
-                  arr[i] = arr[j];
-                  arr[j] = tmp;
-                  i++;
-                  j--;
-            }
-      };
-
-      /* recursion */
-
-      if (left < j)
-            quickSortRec(arr, left, j);
-      if (i < right)
-            quickSortRec(arr, i, right);
+        if(gauche < droite)
+            echanger(tab, gauche, droite);
+        else break;
+    }
+    
+	quickSortRec(tab, g, droite);
+	quickSortRec(tab, droite+1, d);
 }
 
 void quickSort(int* tab, int size)
+/* 
+ * Fonction appelé dans le fichier principal qui lance 
+ * quickSortRec qui est un algorithme récursif 
+ */
 {
-	quickSortRec(tab, (int)0, size);
+	quickSortRec(tab, 0, size - 1);
 }
+
 #endif // __QUICKSORT_H__
 

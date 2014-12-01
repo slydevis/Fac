@@ -1,29 +1,29 @@
 #ifndef __BUBBLESORT_H__
 #define __BUBBLESORT_H__
 
-void bubbleSort(int* tab, int size)
+void bubbleSort(int* t, int n)
+/* 
+ * Execute l'algorithme du tri à bulle pour un tableau de taille n 
+ */
 {
-	  int echange_effectue;
-	  do
-	  {
-		  echange_effectue = 0;
-		  for(int j = 0; j < size - 1; ++j)
-		  {
-			  if(tab[j] > tab[j+1]) 
-			  {
-				  echange_effectue = 1;
-
-				  // swap(&tab[j], &tab[j+1]);
-				  
-				  int buff;
-				  buff = tab[j];
-				  tab[j] = tab[j+1];
-				  tab[j + 1] = buff; 
-			  }
-		   }
-		   size = size - 1;
-       }
-       while (echange_effectue == 1);       
+	int i, j;
+	i = 0;
+	while(i < n - 1)
+	{
+		j = n - 1;
+		while(j > i)
+		{
+			if(t[j] < t[i])
+			{
+				int tmp;
+				tmp = t[i];
+				t[i] = t[j];
+				t[j] = tmp;
+			}
+			--j;
+		}
+		++i;
+	}
 }
 
 #endif // __BUBBLESORT_H__

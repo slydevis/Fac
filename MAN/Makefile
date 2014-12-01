@@ -1,6 +1,6 @@
 SHELL  = /bin/bash
 CC     = gcc
-CFLAGS = -Wall -W -std=c99 -pedantic
+CFLAGS = -Wall -W -std=c99 -pedantic -I.
 
 # Rajouter le nom des executables apres '=', separes par un espace.
 # Si une ligne est pleine, rajouter '\' en fin de ligne et passer a la suivante.
@@ -18,11 +18,11 @@ help ::
 	$(CC) -c $(CFLAGS) $*.h
 
 all :: clean
-all :: $(EXECS)
+all :: $(EXECS) 
 
 debug : clean
 debug : CFLAGS += -DDEBUG
-debug : $(EXECS)
+debug : $(EXECS) 
 
 $(EXECS) : %: %.o
 	$(CC) -o $@.out $@.o
