@@ -1,9 +1,3 @@
-// Tri avec ABR ====> TODO
-// Tri par tas ====> TD3 TODO
-// Tri par insertion séquentielle avec liste chaînées ====> VOUS TODO
-// Tri à casiers ====> VOUS TODO
-// Tri par adressage direct ====> VOUS + COURS TODO
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h> // sleep()
@@ -19,8 +13,6 @@
 #include "insertSeq.h"
 #include "insertDico.h"
 #include "radixSort.h"
-#include "ABRSort.h"
-#include "heapSort.h"
 
 #define MAX 10
 
@@ -177,13 +169,9 @@ void selectSort(int choix)
             break;
         case 7:
 			printf("\n-----> Tri avec ABR\n\n");
-			functor = &ABRSort;
-			currentSort = "Tri ABR"; // TODO
             break;
 		case 8:
 			printf("\n-----> Heap Sort\n\n");
-			currentSort = "Heap Sort"; // TODO
-			functor = &heapSort;
 			return;
 			break;
 		case 9:
@@ -197,12 +185,10 @@ void selectSort(int choix)
 			break;
 		case 11:
 			printf("\n-----> Tri à casiers\n\n");
-			// Pas trouvé d'information sur ce tri donc non fait
 			return;
 			break;
 		case 12:
 			printf("\n-----> Tri par adressage direct\n\n");
-			// Pas trouvé d'information sur ce tri donc non fait
 			return;
 			break;
         default:

@@ -2,7 +2,10 @@
 #include <limits>
 
 #include <iostream>
-CGraph CGraph::prim() const {
+
+CGraph CGraph::prim() {
+
+	tabLink.resize(tabNodes.size(),std::vector<int>(tabNodes.size(), 0));
 
 	CGraph outputPrim;
 
@@ -21,12 +24,7 @@ CGraph CGraph::prim() const {
 		Link link;
 		int minWeight = std::numeric_limits<int>::max();
 
-		for(unsigned i = 0; i < tabArreteTraversante.size(); ++i)
-		{
-			std::cout << tabArreteTraversante[i]->getKey() << std::endl;
-		}
-
-		unsigned key;
+		int key;
 		for(unsigned i = 0; i < tabArreteTraversante.size(); ++i)
 		{
 			Link linkBuff = tabArreteTraversante[i]->getMinLink();
@@ -46,7 +44,33 @@ CGraph CGraph::prim() const {
 
 		// Pour le calcul de l'ultrametrique
 
+		unsigned i;
+		unsigned j;
+
+		for(i = 0; i < tabNodes.size(); ++i)
+			if(key == tabNodes[i]->getKey())
+				break;
+
+		for(j = 0; j < tabNodes.size(); ++j)
+			if(link.to->getKey() == tabNodes[j]->getKey())
+				break;
+
+		for(unsigned k = i; k < tabLink[0].size(); ++k)
+		{
+			for(unsigned l = j; l < tabLink[0].size(); ++l)
+			{
+				int max = link.weight;
+
+				for(unsigned m = l; m > 0; --m)
+					if(tabLink[m][k] > max)
+						max = tabLink[m][k];
+
+				tabLink[l][k] = max;
+			}
+		}
 	}
+
+	outputPrim.tabLink = this->tabLink;
 
     return outputPrim;
 }
@@ -102,4 +126,20 @@ void CGraph::add(int Inode) {
 
 	tabNodes.push_back(node);
     return;
+}
+
+int CGraph::ultraMetric(int key1, int key2) const
+{
+	unsigned i;
+	unsigned j;
+
+	for(i = 0; i < tabNodes.size(); ++i)
+		if(tabNodes[i]->getKey() == key1)
+			break;
+
+	for(j = 0; i < tabNodes.size(); ++j)
+		if(tabNodes[j]->getKey() == key2)
+			break;
+
+	return tabLink[j][i];
 }

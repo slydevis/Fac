@@ -233,3 +233,140 @@ int main(int argc, char* argv[]) {
 	
 	fermer_serveur(&ser);
 }
+
+// TP9 : Serveur TCP/IP
+
+#define REQSIZE 4096
+typedef struct {
+    .....
+    char rep[REQSIZE];
+    int rep_pos, fin_entete;
+} Slot;
+
+void init_slot(Slot *o) {
+    .....
+    o->rep[0] = '\0';
+    o->rep_pos = 0;
+    o->fin_entete = 0;
+}
+
+int lire_suite_requete(Slot *o) {
+    int k = bor_read_str(o->soc, o->rep + o->rep_pos, REQSIZE - o->rep_pos);
+    if(k > 0) o->rep_pos += k;
+    return k;
+}
+
+int ecrire_suite_reponse(Slot *o) {
+    int k = bor_write_str(o->soc, o->rep + o->rep_pos);
+    if(k < 0) o->rep_pos += k;
+    return k;
+}
+
+int chercher_fin_entete(Slot *o, int debut) {
+    for(int i = debut; o->rep[i]; ++i)
+    {
+        if((o->rep[i] == '\n' && o->rep[i + 1] == '\n') ||
+           (o->rep[i] == '\r' && o->rep[i + 1] == '\n' && o->rep[i + 2] == '\r' && o->rep[i + 3] == '\n'))
+            return i;
+    }
+    return -1;
+}
+
+typedef enum {
+    M_NONE,
+    M_GET,
+    M_TRACE,
+} Id_methode;
+
+typedef enum {
+    C_OK                = 200,
+    C_BAD_REQUEST       = 400,
+    C_NOT_FOUND         = 404,
+    C_METHOD_UNKNOWN    = 501,
+} Code_reponse;
+
+typedef struct {
+    char methode[REQSIZE], url[REQSIZE], version[REQSIZE], chemin[REQSIZE];
+    Id_methode id_meth;
+    Code_reponse code_rep;
+} Infos_entete;
+
+
+char* get_http_error_message(Code_reponse code) {
+    switch (code) {
+    case C_OK:
+        printf("OK");
+        break;
+    case C_BAD_REQUEST:
+        printf("Erreur 400 : Bad request");
+        break;
+    case C_NOT_FOUND:
+        printf("Erreur 404 : Not found");
+        break;
+    case C_METHOD_UNKNOWN:
+        printf("Erreur 501 : Method unknown");
+        break;
+    default:
+        printf("Code message inconnue");
+        break;
+    }
+}
+
+Id_methode get_id_methode(char* methode) {
+    if(!strcasecmp(methode, "GET")) return M_GET;
+    if(!strcasecmp(methode, "TRACE")) return M_TRACE;
+    return M_NONE;
+}
+
+void analyser_requete(Slot *o, Infos_entete *ie) {
+    // provisoire
+    (void) o;
+    ie->code_rep = C_NOT_FOUND;
+}
+
+void preparer_reponse(Slot *o, Infos_entete *ie) {
+    // provisoire
+    (void) ie;
+    sprintf(o->rep, "HTTP/1.1 404 Not.found\n"
+            "server : serweb\n"
+            "connection : close\n"
+            "Content-Type : text/html\n\n"
+            "<html><head>\n"
+            "<title>Not found</title>\n"
+            "</head><body>\n"
+            "<h1>Not Found</h1>\n"
+            "</body></html>\n");
+}
+
+int proceder_lecture__requete(Slot *o) {
+    int prec_pos = o->rep_pos;
+    int k = lire_suite_requete(o);
+    if(k <= 0) return -1;
+    int debut = prec_pos - 3;
+    o->fin_entete = chercher_fin_entete(o, debut);
+
+    if(o->fin_entete < 0)
+    {
+        printf("Serveur[%d] : requete incomplete\n", o->soc);
+        return 1;
+    }
+
+    printf("Serveur[%d] : reçue requête complete\n\"%s\"\n", o->soc, o->rep);
+    analyser_requete(o, &ie);
+    preparer_reponse(o, &ie);
+    o->etat = E_ECRIRE_REPONSE;
+    return 1;
+}
+
+int proceder_ecriture_reponse(Slot *o)
+{
+    int k = ecrire_suite_reponse(o);
+    if(k < 0) return -1;
+    if(o->rep_pos < (int)strlen(o->rep)) {
+        printf("Serveur[%d] écriture réponse incomplète\n", o->soc);
+
+        return -1
+    }
+    // On envoie ensuite le fichier
+    return 0; // pour le moment
+}

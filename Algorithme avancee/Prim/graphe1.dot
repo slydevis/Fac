@@ -1,0 +1,8 @@
+graph G { 
+5 -- 3 [label=" 5", arrowtail=dot, arrowhead=open];
+5 -- 6 [label=" 6", arrowtail=dot, arrowhead=open];
+6 -- 1 [label=" 1", arrowtail=dot, arrowhead=open];
+6 -- 4 [label=" 3", arrowtail=dot, arrowhead=open];
+6 -- 3 [label=" 8", arrowtail=dot, arrowhead=open];
+
+}
