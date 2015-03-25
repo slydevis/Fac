@@ -14,12 +14,24 @@
  
 extern FILE *yyin;
 
+char tableSymbole[] = {
+  ';', '+', '-', '*', '/', '(', ')',
+  '[', ']', '{', '}', '=', '<',
+  '&', '|', '!', ',', '\0'
+};
+
+int codeSymbole[] = {
+  POINT_VIRGULE, PLUS, MOINS, FOIS, DIVISE, PARENTHESE_OUVRANTE, PARENTHESE_FERMANTE,
+  CROCHET_OUVRANT, CROCHET_FERMANT, ACCOLADE_OUVRANTE, ACCOLADE_FERMANTE, EGAL, INFERIEUR,
+  ET, OU, NON, VIRGULE
+};
+
 char *tableMotsClefs[] = {
-	"si", 
+  "si", "alors", "sinon", "tantque", "faire", "entier", "retour", "lire", "ecrire", "pour", '\0'
 };
 
 int codeMotClefs[] = { 
-	SI, 
+  SI, ALORS, SINON, TANTQUE, FAIRE, ENTIER, RETOUR, LIRE, ECRIRE, POUR
 };
 
 char yytext[YYTEXT_MAX];
@@ -82,127 +94,105 @@ void delireCar()
  * Pour les tokens de type ID_FCT, ID_VAR et NOMBRE la
  * valeur du token est dans yytext, visible dans l'analyseur syntaxique.
  ******************************************************************************/
+
 int yylex(void)
 {
-    // char c;
+    char c;
     int i;
     yytext[yyleng = 0] = '\0';
+
+    mangeEspaces();
     
-    while(!feof(yyin))
+    if(feof(yyin)) return FIN;
+
+    i = 0;
+    c = lireCar();
+
+    // Symboles
+    while(tableSymbole[i] != '\0')
     {
-        i = mangeEspaces();
-        
-        if(i == -1)
-            return FIN;
-        
-        i = lireCar();
-        
-        // c = (char) i;
-        
-        // 1) Symboles simples
-        
-        switch((char) i)
-        {
-            case '+':
-                return PLUS;
-                break;
-            case '-':
-                return MOINS;
-                break;
-            case '*':
-                return FOIS;
-                break;
-            case '/':
-                return DIVISE;
-                break;
-            case '(':
-                return PARENTHESE_OUVRANTE;
-                break;
-            case ')':
-                return PARENTHESE_FERMANTE;
-                break;
-            case '[':
-                return CROCHET_OUVRANT;
-                break;
-            case ']':
-                return CROCHET_FERMANT;
-                break;
-            case '{':
-                return ACCOLADE_OUVRANTE;
-                break;
-            case '}':
-                return ACCOLADE_FERMANTE;
-                break;
-            case '=':
-                return EGAL;
-                break;
-            case '<':
-                return INFERIEUR;
-                break;
-            case '&':
-                return ET;
-                break;
-            case '|':
-                return OU;
-                break;
-            case '!':
-                return NON;
-                break;
-            case ',':
-                return VIRGULE;
-                break;
-            case ';':
-                return POINT_VIRGULE;
-                break;
-        }
-        
-        // 2) NOMBRES
-        
-        if(is_num(i))
-        {   
-            while(is_num(i))
-                i = lireCar();
+        if( c == tableSymbole[i] ) return codeSymbole[i];
+        ++i;
+    }
 
-            delireCar();
-            return NOMBRE;
-        }
-        
-        // 3) MOT CLEF DU LANGAGE
-                
-        if(is_alpha(i))
-        {   
-            while(is_alpha(i))
-            {
-                i = lireCar();
-            }
-            
-            delireCar();
-            
-            if(yytext[0] == '$')
-                return ID_VAR;
+    // Nombres
+    if( is_num( c ) )
+    {
+        do { lireCar(); }
+        while( is_num( yytext[yyleng - 1] ) );
 
-            if(strcmp(yytext, "si") == 0)
-                return SI;
-            else if(strcmp(yytext, "alors") == 0)
-                return ALORS;
-            else if(strcmp(yytext, "sinon") == 0)
-                return SINON;
-            else if(strcmp(yytext, "tantque") == 0)
-                return TANTQUE;
-            else if(strcmp(yytext, "faire") == 0)
-                return FAIRE;
-            else if(strcmp(yytext, "retour") == 0)
-                return RETOUR;
-            else if(strcmp(yytext, "lire") == 0)
-                return LIRE;
-            else if(strcmp(yytext, "ecrire") == 0)
-                return ECRIRE;
-            else 
-                return ID_FCT;
-        }
+        delireCar();
+        return NOMBRE;
     }
     
-    return -1;
+    //id_var
+    if( c == '$' )
+    {
+        do
+        {
+          c = lireCar();
+        }
+        while(is_alphanum(c));
+        delireCar();
+
+        return ID_VAR;
+    }
+
+    // Mot clefs
+    if(is_alpha(c))
+    {
+        do
+        {
+            c = lireCar();
+            
+            i = 0;
+            while(tableMotsClefs[i] != '\0') {
+                if(strcmp(yytext, tableMotsClefs[0]) == 0)
+                {
+                    c = lireCar();
+                    
+                    if(c == 'n')
+                    {
+                        int j = 0;
+                        
+                        while(j < 2)
+                        {
+                            c = lireCar();
+                            j++;
+                        }
+                        
+                        if(strcmp(yytext, tableMotsClefs[2]) == 0)
+                            return codeMotClefs[2];
+                    }
+                    else 
+                        return codeMotClefs[0];
+                }
+                else if(strcmp(yytext, tableMotsClefs[i]) == 0)
+                    return codeMotClefs[i];
+                ++i;
+            }
+        }
+        while(is_alpha(c));
+
+        while(yyleng != 1) delireCar();
+    }
+
+    c = lireCar();
+    
+    // Id_fct
+    if( is_alpha(c))
+    {
+        do
+        {
+            c = lireCar();
+        }
+        while(is_alpha(c) && c != '(');
+
+        delireCar();
+        return ID_FCT;
+    }
+    
+    return FIN;
 }
 
 /*******************************************************************************
@@ -210,41 +200,42 @@ int yylex(void)
  * afficher des messages d'erreur et l'arbre XML 
  ******************************************************************************/
 void nom_token( int token, char *nom, char *valeur ) {
-	int i;
-	  
-	strcpy( nom, "symbole" );
-	if(token == POINT_VIRGULE) strcpy( valeur, "POINT_VIRGULE");
-	else if(token == PLUS) strcpy(valeur, "PLUS");
-	else if(token == MOINS) strcpy(valeur, "MOINS");
-	else if(token == FOIS) strcpy(valeur, "FOIS");
-	else if(token == DIVISE) strcpy(valeur, "DIVISE");
-	else if(token == PARENTHESE_OUVRANTE) strcpy(valeur, "PARENTHESE_OUVRANTE");
-	else if(token == PARENTHESE_FERMANTE) strcpy(valeur, "PARENTHESE_FERMANTE");
-	else if(token == CROCHET_OUVRANT) strcpy(valeur, "CROCHET_OUVRANT");
-	else if(token == CROCHET_FERMANT) strcpy(valeur, "CROCHET_FERMANT");
-	else if(token == ACCOLADE_OUVRANTE) strcpy(valeur, "ACCOLADE_OUVRANTE");
-	else if(token == ACCOLADE_FERMANTE) strcpy(valeur, "ACCOLADE_FERMANTE");
-	else if(token == EGAL) strcpy(valeur, "EGAL");
-	else if(token == INFERIEUR) strcpy(valeur, "INFERIEUR");
-	else if(token == ET) strcpy(valeur, "ET");
-	else if(token == OU) strcpy(valeur, "OU");
-	else if(token == NON) strcpy(valeur, "NON");
-	else if(token == SI) strcpy(valeur, "SI");
-	else if(token == ALORS) strcpy(valeur, "ALORS");
-	else if(token == SINON) strcpy(valeur, "SINON");
-	else if(token == TANTQUE) strcpy(valeur, "TANTQUE");
-	else if(token == FAIRE) strcpy(valeur, "FAIRE");
-	else if(token == ENTIER) strcpy(valeur, "ENTIER");
-	else if(token == RETOUR) strcpy(valeur, "RETOUR");
-	else if(token == LIRE) strcpy(valeur, "LIRE");
-	else if(token == ECRIRE) strcpy(valeur, "ECRIRE");
-	else if(token == FIN) strcpy(valeur, "FIN");
-	else if(token == VIRGULE) strcpy(valeur, "VIRGULE");
+    int i;
 
-	else if( token == ID_VAR ) {
-		strcpy( nom, "id_variable" );  
-		strcpy( valeur, yytext );        
-	}
+    strcpy( nom, "symbole" );
+    if(token == POINT_VIRGULE) strcpy( valeur, "POINT_VIRGULE");
+    else if(token == PLUS) strcpy(valeur, "PLUS");
+    else if(token == MOINS) strcpy(valeur, "MOINS");
+    else if(token == FOIS) strcpy(valeur, "FOIS");
+    else if(token == DIVISE) strcpy(valeur, "DIVISE");
+    else if(token == PARENTHESE_OUVRANTE) strcpy(valeur, "PARENTHESE_OUVRANTE");
+    else if(token == PARENTHESE_FERMANTE) strcpy(valeur, "PARENTHESE_FERMANTE");
+    else if(token == CROCHET_OUVRANT) strcpy(valeur, "CROCHET_OUVRANT");
+    else if(token == CROCHET_FERMANT) strcpy(valeur, "CROCHET_FERMANT");
+    else if(token == ACCOLADE_OUVRANTE) strcpy(valeur, "ACCOLADE_OUVRANTE");
+    else if(token == ACCOLADE_FERMANTE) strcpy(valeur, "ACCOLADE_FERMANTE");
+    else if(token == EGAL) strcpy(valeur, "EGAL");
+    else if(token == INFERIEUR) strcpy(valeur, "INFERIEUR");
+    else if(token == ET) strcpy(valeur, "ET");
+    else if(token == OU) strcpy(valeur, "OU");
+    else if(token == NON) strcpy(valeur, "NON");
+    else if(token == SI) strcpy(valeur, "SI");
+    else if(token == ALORS) strcpy(valeur, "ALORS");
+    else if(token == SINON) strcpy(valeur, "SINON");
+    else if(token == TANTQUE) strcpy(valeur, "TANTQUE");
+    else if(token == FAIRE) strcpy(valeur, "FAIRE");
+    else if(token == ENTIER) strcpy(valeur, "ENTIER");
+    else if(token == RETOUR) strcpy(valeur, "RETOUR");
+    else if(token == LIRE) strcpy(valeur, "LIRE");
+    else if(token == ECRIRE) strcpy(valeur, "ECRIRE");
+    else if(token == FIN) strcpy(valeur, "FIN");
+    else if(token == VIRGULE) strcpy(valeur, "VIRGULE");
+    else if(token == POUR) strcpy(valeur, "POUR");
+
+    else if( token == ID_VAR ) {
+        strcpy( nom, "id_variable" );  
+        strcpy( valeur, yytext );        
+    }
 	else if( token == ID_FCT ) {
 		strcpy( nom, "id_fonction" );    
 		strcpy( valeur, yytext );    
@@ -277,3 +268,5 @@ void test_yylex_internal(FILE *yyin) {
 	}
 	printf("%s %d\n", yytext, uniteCourante);
 }
+
+void getYYTEXT(char* value) { strcpy(value, yytext); }

@@ -1,0 +1,31 @@
+<programme>
+  <optDecVariables>
+    <listeDecVariables>
+      <declarationVariable>
+        <mot_clef>entier</mot_clef>
+        <id_variable>$i</id_variable>
+        <optTailleTableau>
+        </optTailleTableau>
+      </declarationVariable>
+      <listeDecVariablesBis>
+      </listeDecVariablesBis>
+    </listeDecVariables>
+    <symbole>POINT_VIRGULE</symbole>
+  </optDecVariables>
+  <listeDecFonctions>
+    <declarationFonction>
+      <id_fonction>main</id_fonction>
+      <listeParam>
+        <symbole>PARENTHESE_OUVRANTE</symbole>
+        <optListeDecVariables>
+        </optListeDecVariables>
+        <symbole>PARENTHESE_FERMANTE</symbole>
+      </listeParam>
+      <optDecVariables>
+      </optDecVariables>
+      <instructionBloc>
+        <symbole>ACCOLADE_OUVRANTE</symbole>
+        <listeInstructions>
+Erreur de syntaxe uniteCourante = 22
+Function : LI()
+Line : 967

@@ -46,8 +46,6 @@
 #define _instructionFaire_ 40
 #define _optListeDecVariables_ 41
 
-
-
 /* symboles terminaux */
 #define NB_TERMINAUX 31
 
@@ -81,4 +79,5 @@
 #define NOMBRE 28
 #define FIN 29
 #define VIRGULE 30
+#define POUR 32
 

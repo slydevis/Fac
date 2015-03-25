@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+
+while(<>){
+    if(s/<(\/?)pg>/<$1programme>/){print;}
+    elsif(s/<(\/?)ldv>/<$1listeDecVariables>/){print;}
+    elsif(s/<(\/?)ldf>/<$1listeDecFonctions>/){print;}
+    elsif(s/<(\/?)dv>/<$1declarationVariable>/){print;}
+    elsif(s/<(\/?)df>/<$1declarationFonction>/){print;}
+    elsif(s/<(\/?)lp>/<$1listeParam>/){print;}
+    elsif(s/<(\/?)li>/<$1listeInstructions>/){print;}
+    elsif(s/<(\/?)i>/<$1instruction>/){print;}
+    elsif(s/<(\/?)iaff>/<$1instructionAffect>/){print;}  
+    elsif(s/<(\/?)ib>/<$1instructionBloc>/){print;}
+    elsif(s/<(\/?)isi>/<$1instructionSi>/){print;}
+    elsif(s/<(\/?)itq>/<$1instructionTantque>/){print;} 
+    elsif(s/<(\/?)iapp>/<$1instructionAppel>/){print;}
+    elsif(s/<(\/?)iret>/<$1instructionRetour>/){print;}
+    elsif(s/<(\/?)iecr>/<$1instructionEcriture>/){print;}
+    elsif(s/<(\/?)ivide>/<$1instructionVide>/){print;}
+    elsif(s/<(\/?)var>/<$1var>/){print;}
+    elsif(s/<(\/?)exp>/<$1expression>/){print;}
+    elsif(s/<(\/?)appf>/<$1appelFct>/){print;}
+    elsif(s/<(\/?)conj>/<$1conjonction>/){print;}
+    elsif(s/<(\/?)neg>/<$1negation>/){print;}
+    elsif(s/<(\/?)comp>/<$1comparaison>/){print;}
+    elsif(s/<(\/?)e>/<$1expArith>/){print;}
+    elsif(s/<(\/?)t>/<$1terme>/){print;}
+    elsif(s/<(\/?)f>/<$1facteur>/){print;}
+#    elsif(s/<(\/?)>/<$1argumentsEffectifs>/){print;} 
+    elsif(s/<(\/?)lexp>/<$1listeExpressions>/){print;}
+    elsif(s/<(\/?)lexpb>/<$1listeExpressionsBis>/){print;}
+    elsif(s/<(\/?)conjb>/<$1conjonctionBis>/){print;}
+    elsif(s/<(\/?)ott>/<$1optTailleTableau>/){print;}
+    elsif(s/<(\/?)eb>/<$1expArithBis>/){print;}
+    elsif(s/<(\/?)osinon>/<$1optSinon>/){print;}
+    elsif(s/<(\/?)compb>/<$1comparaisonBis>/){print;}
+    elsif(s/<(\/?)odv>/<$1optDecVariables>/){print;}
+    elsif(s/<(\/?)oind>/<$1optIndice>/){print;}
+    elsif(s/<(\/?)ldvb>/<$1listeDecVariablesBis>/){print;}
+    elsif(s/<(\/?)tb>/<$1termeBis>/){print;}
+    elsif(s/<(\/?)expb>/<$1expressionBis>/){print;}
+    elsif(s/<(\/?)odv>/<$1optListeDecVariables>/){print;}
+    else{print;}
+}

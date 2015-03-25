@@ -1,0 +1,30 @@
+<programme>
+  <optDecVariables>
+    <listeDecVariables>
+      <declarationVariable>
+        <mot_clef>entier</mot_clef>
+        <id_variable>$a</id_variable>
+        <optTailleTableau>
+        </optTailleTableau>
+      </declarationVariable>
+      <listeDecVariablesBis>
+        <symbole>VIRGULE</symbole>
+        <declarationVariable>
+          <mot_clef>entier</mot_clef>
+          <id_variable>$b</id_variable>
+          <optTailleTableau>
+          </optTailleTableau>
+        </declarationVariable>
+        <listeDecVariablesBis>
+        </listeDecVariablesBis>
+      </listeDecVariablesBis>
+    </listeDecVariables>
+    <symbole>POINT_VIRGULE</symbole>
+  </optDecVariables>
+  <listeDecFonctions>
+    <declarationFonction>
+      <id_fonction>double</id_fonction>
+      <listeParam>
+Erreur de syntaxe uniteCourante = 29
+Function : LP()
+Line : 833
