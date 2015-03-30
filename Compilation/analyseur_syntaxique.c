@@ -703,7 +703,7 @@ n_l_dec* LDVB() {
     }
     else if(estSuivant(_listeDecVariablesBis_, uniteCourante)) {
         affiche_balise_fermante("listeDecVariablesBis", 1);
-        return cree_n_l_dec(dv, ldvb);
+        return NULL;
     }
     else
         printError(__FUNCTION__, __LINE__);
@@ -1620,9 +1620,9 @@ n_exp* F() {
 
     if(uniteCourante == NOMBRE)
     {
-        consommer();
         char* buff = malloc(sizeof(char)*100);
         getValues(buff);
+        consommer();
         return cree_n_exp_entier(atoi(buff));
     }
     else if(uniteCourante == PARENTHESE_OUVRANTE)
@@ -1675,8 +1675,7 @@ n_var* VAR() {
     char* nom = malloc(sizeof(char)*100);
     n_exp* oind = NULL;
 
-    if(uniteCourante == ID_VAR)
-    {
+    if(uniteCourante == ID_VAR) {
         getValues(nom);
         consommer();
         oind = OIND();
