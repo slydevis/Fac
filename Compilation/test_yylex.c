@@ -4,6 +4,7 @@
 #include "analyseur_syntaxique.h"
 #include "symboles.h"
 #include "affiche_arbre_abstrait.h"
+#include "dico.h"
 
 char yytext[100];
 FILE *yyin;
@@ -27,12 +28,8 @@ int main(int argc, char **argv) {
 
     printf("\nArbre abstrait ====>\n\n");
     affiche_n_prog(pg);
-    
-  /*while (uniteCourante != FIN) {
-    nom_token( uniteCourante, nom, valeur );
-    printf("%s\t%s\t%s\n", yytext, nom, valeur);
-    uniteCourante = yylex();
-  }*/
-  
+    printf("\nTable des symboles ======>\n\n");
+    symbole_n_prog(pg);
+    affiche_dico();
     return 0;
 }
