@@ -8,6 +8,20 @@ int contexte = C_VARIABLE_GLOBALE;
 int adresseArgumentCourant;
 int adresseLocaleCourante;
 
+int getParamNumber(n_dec* n) {
+    if(n->u.foncDec_.param == NULL) return 0;
+
+    int i = 0;
+    n_l_dec* param = n->u.foncDec_.param;
+
+    while(param != NULL) {
+        param = param->queue;
+        ++i;
+    }
+
+    return i;
+}
+
 /*-------------------------------------------------------------------------*/
 
 void entreeFonction(void){
@@ -20,8 +34,7 @@ void entreeFonction(void){
 /*-------------------------------------------------------------------------*/
 
 void sortieFonction(void){
-    // TODO : Voir si il faut pas remettre cette ligne
-  //dico.sommet = dico.base;
+  dico.sommet = dico.base;
   dico.base = 0;
   contexte = C_VARIABLE_GLOBALE;  
 }
@@ -365,8 +378,9 @@ void symbole_foncDec(n_dec *n)
         }
     }
 
-    // @TODO : Nombres de paramètres
-    ajouteIdentificateur(n->nom, C_VARIABLE_GLOBALE, T_FONCTION, dico.sommet, 0);
+    i = getParamNumber(n);
+    
+    ajouteIdentificateur(n->nom, C_VARIABLE_GLOBALE, T_FONCTION, dico.sommet, i);
     entreeFonction();
     symbole_l_dec(n->u.foncDec_.param);
     symbole_l_dec(n->u.foncDec_.variables);
@@ -378,7 +392,6 @@ void symbole_foncDec(n_dec *n)
 
 void symbole_varDec(n_dec *n)
 {
-    // TODO : Mettre la bonne adresse
     int i;
     for(i = dico.base; i < dico.sommet; ++i) {
         if(strcmp(n->nom, dico.tab[i].identif) == 0) {
@@ -397,10 +410,6 @@ void symbole_varDec(n_dec *n)
 
 void symbole_tabDec(n_dec *n)
 {
-  //char texte[100]; // Max. 100 chars nom tab + taille
-  //sprintf(texte, "%s[%d]", n->nom, n->u.tabDec_.taille);
-  //affiche_element( "tabDec", texte, 1);
-
   int i;
     for(i = dico.base; i < dico.sommet; ++i) {
         if(strcmp(n->nom, dico.tab[i].identif) == 0) {
@@ -409,7 +418,12 @@ void symbole_tabDec(n_dec *n)
         }
     }
 
-    ajouteIdentificateur(n->nom, contexte, T_TABLEAU_ENTIER, adresseLocaleCourante, n->u.tabDec_.taille);
+    if(contexte == C_VARIABLE_LOCALE) {
+        printf("Error : Un tableau ne peux être déclaré en local pour %s\n", n->nom);
+        exit(-1);
+    }
+
+    ajouteIdentificateur(n->nom, C_VARIABLE_GLOBALE, T_TABLEAU_ENTIER, dico.sommet, n->u.tabDec_.taille);
     adresseLocaleCourante++;
 }
 
