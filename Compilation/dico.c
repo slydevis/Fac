@@ -9,8 +9,6 @@ int adresseArgumentCourant;
 int adresseLocaleCourante;
 
 int getParamNumber(n_dec* n) {
-    if(n->u.foncDec_.param == NULL) return 0;
-
     int i = 0;
     n_l_dec* param = n->u.foncDec_.param;
 
