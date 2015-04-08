@@ -15,6 +15,13 @@ int main(int argc, char **argv) {
     char nom[100];
     char valeur[100];
     yyin = fopen(argv[1], "r");
+    yyin2 = argv[1];
+    
+    char* yyout = NULL;
+    yyout = malloc(sizeof(char)*100);
+    sprintf(yyout, "%s.out", yyin2);
+    remove(yyout);
+
     if(yyin == NULL){
         fprintf(stderr, "impossible d'ouvrir le fichier %s\n", argv[1]);
         exit(1);

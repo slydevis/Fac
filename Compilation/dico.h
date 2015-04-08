@@ -39,5 +39,5 @@ dico_ dico;
 extern int contexte;
 extern int adresseLocaleCourante;
 extern int adresseArgumentCourant;
-
+char* yyin2;
 #endif

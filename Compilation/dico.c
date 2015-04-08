@@ -22,6 +22,142 @@ int getParamNumber(n_dec* n) {
 
 /*-------------------------------------------------------------------------*/
 
+void ecrireFichier(char* str) {
+    FILE* fic = NULL;
+    char* yyout = malloc(sizeof(char)*100);
+    sprintf(yyout, "%s.out", yyin2);
+
+    fic = fopen(yyout, "a+");
+
+    if(fic != NULL) {
+        fputs(str, fic);
+        fputc('\n', fic);
+        fclose(fic);
+    }
+    else {
+        printf("Impossible d'ouvrir le fichier de sortie\n");
+        exit(-1);
+    }
+
+    free(yyout);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void li(char* reg, int val);
+void sub(char* regDest, char* reg1, char* reg2);
+void subu(char* regDest, char* reg, int value);
+void add(char* regDest, char* reg1, char* reg2);
+void addu(char* reg, char* reg2, int val);
+void sw(char* reg, char* adr);
+void lw(char* reg, char* adr);
+void divMIPS(char* regDest, char* reg1, char* reg2);
+void mult(char* regDest, char* reg1, char* reg2);
+
+/*-------------------------------------------------------------------------*/
+
+void empiler(char* reg) { 
+    subu("$sp", "$sp", 4);
+    sw(reg, "$sp");
+}
+
+/*-------------------------------------------------------------------------*/
+
+void depiler(char* reg) { 
+    addu("$sp", "$sp", 4);
+    lw(reg, "$sp");
+}
+
+/*-------------------------------------------------------------------------*/
+
+void syscall(int valeur) {
+    li("$v0", valeur);
+    ecrireFichier("syscall");
+}
+
+/*-------------------------------------------------------------------------*/
+
+void li(char* reg, int val) {
+    char* buff = malloc(sizeof(char)*100);
+    sprintf(buff, "li %s, %d", reg, val);
+    ecrireFichier(buff);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void sub(char* regDest, char* reg1, char* reg2) {
+    char* buff = malloc(sizeof(char)*100);
+    sprintf(buff, "sub %s %s %s", regDest, reg1, reg2);
+    ecrireFichier(buff);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void subu(char* regDest, char* reg, int value) {
+    char* buff = malloc(sizeof(char)*100);
+    sprintf(buff, "subu %s %s %d", regDest, reg, value);
+    ecrireFichier(buff);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void sw(char* reg, char* adr) {
+    char* buff = malloc(sizeof(char)*100);
+    sprintf(buff, "sw %s 0(%s)", reg, adr);
+    ecrireFichier(buff);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void add(char* regDest, char* reg1, char* reg2) {
+    char* buff = malloc(sizeof(char)*100);
+    sprintf(buff, "add %s %s %s", regDest, reg1, reg2);
+    ecrireFichier(buff);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void addu(char* reg, char* reg2, int val) {
+    char* buff = malloc(sizeof(char)*100);
+    sprintf(buff, "addu %s %s %d", reg, reg2, val);
+    ecrireFichier(buff);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void lw(char* reg, char* adr) {
+    char* buff = malloc(sizeof(char)*100);
+    sprintf(buff, "lw %s 0(%s)", reg, adr);
+    ecrireFichier(buff);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void divMIPS(char* regDest, char* reg1, char* reg2) {
+    char* buff = malloc(sizeof(char)*100);
+    sprintf(buff, "div %s %s %s", regDest, reg1, reg2);
+    ecrireFichier(buff);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void mult(char* regDest, char* reg1, char* reg2) {
+    char* buff = malloc(sizeof(char)*100);
+    sprintf(buff, "div %s %s %s", regDest, reg1, reg2);
+    ecrireFichier(buff);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
 void entreeFonction(void){
   dico.base = dico.sommet;
   contexte = C_VARIABLE_LOCALE;
@@ -293,32 +429,31 @@ void symbole_varExp(n_exp *n)
 
 void symbole_opExp(n_exp *n)
 {
-  // if(n->u.opExp_.op == plus) affiche_texte("plus", 1);
-  // else if(n->u.opExp_.op == moins) affiche_texte("moins", 1);
-  // else if(n->u.opExp_.op == fois) affiche_texte("fois", 1);
-  // else if(n->u.opExp_.op == divise) affiche_texte("divise", 1);
-  // else if(n->u.opExp_.op == egal) affiche_texte("egal", 1);
-  // else if(n->u.opExp_.op == diff) affiche_texte("diff", 1);
-  // else if(n->u.opExp_.op == inf) affiche_texte("inf", 1);
-  // else if(n->u.opExp_.op == infeg) affiche_texte("infeg", 1);
-  // else if(n->u.opExp_.op == ou) affiche_texte("ou", 1);
-  // else if(n->u.opExp_.op == et) affiche_texte("et", 1);
-  // else if(n->u.opExp_.op == non) affiche_texte("non", 1);  
-  if( n->u.opExp_.op1 != NULL ) {
-    symbole_exp(n->u.opExp_.op1);
-  }
+  depiler("$t0");
+  depiler("$t1");
+
+  symbole_exp(n->u.opExp_.op1);
   if( n->u.opExp_.op2 != NULL ) {
-    symbole_exp(n->u.opExp_.op2);
+      if(n->u.opExp_.op == plus)
+        add("$t0", "$t0", "$t1");
+      else if(n->u.opExp_.op == moins)
+        sub("$t0", "$t0", "$t1");
+      else if(n->u.opExp_.op == divise)
+        divMIPS("$t0", "$t0", "$t1");
+      else if(n->u.opExp_.op == fois)
+        mult("$t0", "$t0", "$t1");
+
+      symbole_exp(n->u.opExp_.op2);
   }
+  
+  empiler("$t0");
 }
 
 /*-------------------------------------------------------------------------*/
 
 void symbole_intExp(n_exp *n)
 {
-  //char texte[ 50 ]; // Max. 50 chiffres
-  //sprintf(texte, "%d", n->u.entier);
-  //affiche_element( "intExp", texte, 1);
+    printf("ICI = AFFECT\n");
 }
 
 /*-------------------------------------------------------------------------*/
