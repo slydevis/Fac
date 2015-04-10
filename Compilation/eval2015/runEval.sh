@@ -3,7 +3,7 @@
 # Script d'évaluation automatique des compilateurs - analyse syntaxique
 # Compile le programme source et compare avec la référence
 
-MYCOMPILO="../test_yylex"
+MYCOMPILO="../compilateur.out"
 RENAMEXML="../rename_xml.perl"
 MYOPTIONS=""
 XMLDIFF="./compare_arbres_xml"

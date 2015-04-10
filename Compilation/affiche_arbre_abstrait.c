@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "syntabs.h"
+#include "dico.h"
 #include "util.h"
 
 void affiche_n_prog(n_prog *n);
@@ -37,6 +38,7 @@ int trace_abs = 1;
 void affiche_n_prog(n_prog *n)
 {
   char *fct = "prog";
+
   affiche_balise_ouvrante(fct, trace_abs);
 
   affiche_l_dec(n->variables);
@@ -248,7 +250,7 @@ void affiche_opExp(n_exp *n)
 void affiche_intExp(n_exp *n)
 {
   char texte[ 50 ]; // Max. 50 chiffres
-  sprintf(texte, "%d", n->u.entier);
+  sprintf(texte, "%d ", n->u.entier);
   affiche_element( "intExp", texte, trace_abs );
 }
 
