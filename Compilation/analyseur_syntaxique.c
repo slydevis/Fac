@@ -57,7 +57,6 @@ void getValues(char * name) {
     char nom[100];
     nom_token(uniteCourante, nom, valeur);
     strcat(name, valeur);
-    strcat(name, " ");
 }
 
 void consommer() {

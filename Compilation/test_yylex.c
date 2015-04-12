@@ -19,6 +19,8 @@ int main(int argc, char **argv) {
     
     char* yyout = NULL;
     yyout = malloc(sizeof(char)*100);
+    sprintf(yyout, "%s.mips", yyin2);
+    remove(yyout);
     sprintf(yyout, "%s.out", yyin2);
     remove(yyout);
 

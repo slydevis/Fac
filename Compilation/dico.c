@@ -7,6 +7,7 @@
 int contexte = C_VARIABLE_GLOBALE;
 int adresseArgumentCourant;
 int adresseLocaleCourante;
+char* yyout = NULL;
 
 int getParamNumber(n_dec* n) {
     int i = 0;
@@ -22,15 +23,19 @@ int getParamNumber(n_dec* n) {
 
 /*-------------------------------------------------------------------------*/
 
-void ecrireFichier(char* str) {
+void ecrireFichier(char* str, char* commentaire) {
     FILE* fic = NULL;
-    char* yyout = malloc(sizeof(char)*100);
-    sprintf(yyout, "%s.out", yyin2);
 
     fic = fopen(yyout, "a+");
 
     if(fic != NULL) {
         fputs(str, fic);
+
+        if(commentaire != NULL) {
+            fputs("\t\t# ", fic);
+            fputs(commentaire, fic);
+        }
+
         fputc('\n', fic);
         fclose(fic);
     }
@@ -38,121 +43,187 @@ void ecrireFichier(char* str) {
         printf("Impossible d'ouvrir le fichier de sortie\n");
         exit(-1);
     }
+}
 
-    free(yyout);
+/*------------------------------------------------------------------------*/
+
+void printGlobalVariable() {
+    FILE* fic = fopen(yyout, "a+");
+
+    if(fic != NULL) {
+          int i;
+          for(i = 0; i < dico.sommet; i++){
+            if(dico.tab[i].classe == C_VARIABLE_GLOBALE) {
+                if(dico.tab[i].type == T_ENTIER) {
+                    char* str = malloc(sizeof(char)*100);
+                    sprintf(str, "%s:\t.space 4\n", dico.tab[i].identif);
+                    fputs(str, fic);
+                    free(str);
+                }
+                //else if(dico.tab[i].type == T_TABLEAU_ENTIER)
+                   // fputs("%s:\t\t.space %d", fic);    
+            }
+
+        printf("%d ", dico.tab[i].adresse);
+        printf("%d\n", dico.tab[i].complement);
+  }
+
+        fclose(fic);
+    }
+
+}
+
+/*------------------------------------------------------------------------*/
+
+void copyFile(char* source, char* dest) {
+    FILE* fileDest = fopen(dest, "a+");
+    FILE* fileSource = fopen(source, "r");
+
+    char carac;
+    if(fileSource != NULL) {
+       if(fileDest != NULL) {
+            do {
+                carac = fgetc(fileSource);
+               if(carac == EOF) break;
+                fputc(carac, fileDest);
+            } while(carac != EOF);
+        }
+        fclose(fileDest);
+        fclose(fileSource);
+        remove(source);
+    }
 }
 
 /*-------------------------------------------------------------------------*/
 
-void li(char* reg, int val);
-void sub(char* regDest, char* reg1, char* reg2);
-void subu(char* regDest, char* reg, int value);
-void add(char* regDest, char* reg1, char* reg2);
-void addu(char* reg, char* reg2, int val);
-void sw(char* reg, char* adr);
-void lw(char* reg, char* adr);
-void divMIPS(char* regDest, char* reg1, char* reg2);
-void mult(char* regDest, char* reg1, char* reg2);
+void createLibelle(char* str) {
+    char* buff = malloc(sizeof(char)*100);
+    sprintf(buff, "%s:", str);
+    ecrireFichier(buff, NULL);
+    free(buff);    
+}
 
 /*-------------------------------------------------------------------------*/
 
-void empiler(char* reg) { 
-    subu("$sp", "$sp", 4);
-    sw(reg, "$sp");
+void li(char* reg, int val, char* commentaire);
+void sub(char* regDest, char* reg1, char* reg2, char* commentaire);
+void subu(char* regDest, char* reg, int value, char* commentaire);
+void add(char* regDest, char* reg1, char* reg2, char* commentaire);
+void addu(char* reg, char* reg2, int val, char* commentaire);
+void sw(char* reg, char* adr, char* commentaire);
+void lw(char* reg, char* adr, char* commentaire);
+void divMIPS(char* regDest, char* reg1, char* reg2, char* commentaire);
+void mult(char* regDest, char* reg1, char* reg2, char* commentaire);
+void jal(char* label, char* commentaire);
+
+/*-------------------------------------------------------------------------*/
+
+void empiler(char* reg) {
+    subu("$sp", "$sp", 4, "empile registre");
+    sw(reg, "$sp", NULL);
 }
 
 /*-------------------------------------------------------------------------*/
 
 void depiler(char* reg) { 
-    addu("$sp", "$sp", 4);
-    lw(reg, "$sp");
+    lw(reg, "$sp", "depile vers registre");
+    addu("$sp", "$sp", 4, NULL);
 }
 
 /*-------------------------------------------------------------------------*/
 
-void syscall(int valeur) {
-    li("$v0", valeur);
-    ecrireFichier("syscall");
+void syscall(int valeur, char* commentaire) {
+    li("$v0", valeur, NULL);
+    ecrireFichier("\tsyscall", commentaire);
 }
 
 /*-------------------------------------------------------------------------*/
 
-void li(char* reg, int val) {
+void li(char* reg, int val, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "li %s, %d", reg, val);
-    ecrireFichier(buff);
+    sprintf(buff, "\tli %s, %d", reg, val);
+    ecrireFichier(buff, commentaire);
     free(buff);
 }
 
 /*-------------------------------------------------------------------------*/
 
-void sub(char* regDest, char* reg1, char* reg2) {
+void sub(char* regDest, char* reg1, char* reg2, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "sub %s %s %s", regDest, reg1, reg2);
-    ecrireFichier(buff);
+    sprintf(buff, "\tsub %s %s %s", regDest, reg1, reg2);
+    ecrireFichier(buff, commentaire);
     free(buff);
 }
 
 /*-------------------------------------------------------------------------*/
 
-void subu(char* regDest, char* reg, int value) {
+void subu(char* regDest, char* reg, int value, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "subu %s %s %d", regDest, reg, value);
-    ecrireFichier(buff);
+    sprintf(buff, "\tsubu %s %s %d", regDest, reg, value);
+    ecrireFichier(buff, commentaire);
     free(buff);
 }
 
 /*-------------------------------------------------------------------------*/
 
-void sw(char* reg, char* adr) {
+void sw(char* reg, char* adr, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "sw %s 0(%s)", reg, adr);
-    ecrireFichier(buff);
+    sprintf(buff, "\tsw %s 0(%s)", reg, adr);
+    ecrireFichier(buff, commentaire);
     free(buff);
 }
 
 /*-------------------------------------------------------------------------*/
 
-void add(char* regDest, char* reg1, char* reg2) {
+void add(char* regDest, char* reg1, char* reg2, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "add %s %s %s", regDest, reg1, reg2);
-    ecrireFichier(buff);
+    sprintf(buff, "\tadd %s %s %s", regDest, reg1, reg2);
+    ecrireFichier(buff, commentaire);
     free(buff);
 }
 
 /*-------------------------------------------------------------------------*/
 
-void addu(char* reg, char* reg2, int val) {
+void addu(char* reg, char* reg2, int val, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "addu %s %s %d", reg, reg2, val);
-    ecrireFichier(buff);
+    sprintf(buff, "\taddu %s %s %d", reg, reg2, val);
+    ecrireFichier(buff, commentaire);
     free(buff);
 }
 
 /*-------------------------------------------------------------------------*/
 
-void lw(char* reg, char* adr) {
+void lw(char* reg, char* adr, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "lw %s 0(%s)", reg, adr);
-    ecrireFichier(buff);
+    sprintf(buff, "\tlw %s 0(%s)", reg, adr);
+    ecrireFichier(buff, commentaire);
     free(buff);
 }
 
 /*-------------------------------------------------------------------------*/
 
-void divMIPS(char* regDest, char* reg1, char* reg2) {
+void divMIPS(char* regDest, char* reg1, char* reg2, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "div %s %s %s", regDest, reg1, reg2);
-    ecrireFichier(buff);
+    sprintf(buff, "\tdiv %s %s %s", regDest, reg1, reg2);
+    ecrireFichier(buff, commentaire);
     free(buff);
 }
 
 /*-------------------------------------------------------------------------*/
 
-void mult(char* regDest, char* reg1, char* reg2) {
+void mult(char* regDest, char* reg1, char* reg2, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "div %s %s %s", regDest, reg1, reg2);
-    ecrireFichier(buff);
+    sprintf(buff, "\tdiv %s %s %s", regDest, reg1, reg2);
+    ecrireFichier(buff, commentaire);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void jal(char* label, char* commentaire) {
+    char* buff = malloc(sizeof(char)*100);
+    sprintf(buff, "\tjal %s", label);
+    ecrireFichier(buff, commentaire);
     free(buff);
 }
 
@@ -171,6 +242,21 @@ void sortieFonction(void){
   dico.sommet = dico.base;
   dico.base = 0;
   contexte = C_VARIABLE_GLOBALE;  
+}
+
+/*-------------------------------------------------------------------------*/
+
+int getMain() {
+    int i;
+    for(i=0; i < dico.sommet; i++){
+        if(dico.tab[i].type == T_FONCTION) {
+            if(strcmp(dico.tab[i].identif, "main")  == 0)
+                return i;
+        }
+    }   
+
+    printf("Error : Fonction main inexistante !\n");
+    exit(-1);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -284,8 +370,33 @@ void symbole_appel(n_appel *n);
 
 void symbole_n_prog(n_prog *n)
 {
-   symbole_l_dec(n->variables);
-   symbole_l_dec(n->fonctions); 
+    if(yyout == NULL)
+      yyout = malloc(sizeof(char)*100);
+
+    sprintf(yyout, "%s.out", yyin2);
+
+    symbole_l_dec(n->variables);
+    symbole_l_dec(n->fonctions); 
+
+    sprintf(yyout, "%s.mips", yyin2);
+
+    ecrireFichier("\t.data", NULL);
+    printGlobalVariable();
+    ecrireFichier("", NULL);
+
+    ecrireFichier("\t.text", NULL);
+    createLibelle("__start");
+    
+    jal(dico.tab[getMain()].identif, NULL);
+    
+    syscall(10, "stoppe l'execution du processus");
+
+    char* source = malloc(sizeof(char)*100);
+    sprintf(source, "%s.out", yyin2);
+    copyFile(source, yyout);
+
+    free(source);
+    free(yyout);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -435,13 +546,13 @@ void symbole_opExp(n_exp *n)
   symbole_exp(n->u.opExp_.op1);
   if( n->u.opExp_.op2 != NULL ) {
       if(n->u.opExp_.op == plus)
-        add("$t0", "$t0", "$t1");
+        add("$t0", "$t0", "$t1", NULL);
       else if(n->u.opExp_.op == moins)
-        sub("$t0", "$t0", "$t1");
+        sub("$t0", "$t0", "$t1", NULL);
       else if(n->u.opExp_.op == divise)
-        divMIPS("$t0", "$t0", "$t1");
+        divMIPS("$t0", "$t0", "$t1", NULL);
       else if(n->u.opExp_.op == fois)
-        mult("$t0", "$t0", "$t1");
+        mult("$t0", "$t0", "$t1", NULL);
 
       symbole_exp(n->u.opExp_.op2);
   }
@@ -514,6 +625,9 @@ void symbole_foncDec(n_dec *n)
     i = getParamNumber(n);
     
     ajouteIdentificateur(n->nom, C_VARIABLE_GLOBALE, T_FONCTION, dico.sommet, i);
+
+    createLibelle(n->nom);
+    
     entreeFonction();
     symbole_l_dec(n->u.foncDec_.param);
     symbole_l_dec(n->u.foncDec_.variables);
