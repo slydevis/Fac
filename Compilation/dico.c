@@ -51,8 +51,8 @@ void printGlobalVariable() {
     FILE* fic = fopen(yyout, "a+");
 
     if(fic != NULL) {
-          int i;
-          for(i = 0; i < dico.sommet; i++){
+      int i;
+      for(i = 0; i < dico.sommet; i++){
             if(dico.tab[i].classe == C_VARIABLE_GLOBALE) {
                 if(dico.tab[i].type == T_ENTIER) {
                     char* str = malloc(sizeof(char)*100);
@@ -60,13 +60,14 @@ void printGlobalVariable() {
                     fputs(str, fic);
                     free(str);
                 }
-                //else if(dico.tab[i].type == T_TABLEAU_ENTIER)
-                   // fputs("%s:\t\t.space %d", fic);    
+                else if(dico.tab[i].type == T_TABLEAU_ENTIER) {
+                    char* str = malloc(sizeof(char)*100);
+                    sprintf(str, "%s:\t.space %d\n", dico.tab[i].identif, 4*dico.tab[i].complement);
+                    fputs(str, fic);
+                    free(str);
+                }
             }
-
-        printf("%d ", dico.tab[i].adresse);
-        printf("%d\n", dico.tab[i].complement);
-  }
+        }
 
         fclose(fic);
     }
@@ -627,7 +628,7 @@ void symbole_foncDec(n_dec *n)
     ajouteIdentificateur(n->nom, C_VARIABLE_GLOBALE, T_FONCTION, dico.sommet, i);
 
     createLibelle(n->nom);
-    
+
     entreeFonction();
     symbole_l_dec(n->u.foncDec_.param);
     symbole_l_dec(n->u.foncDec_.variables);
