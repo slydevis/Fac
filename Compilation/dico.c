@@ -8,6 +8,8 @@ int contexte = C_VARIABLE_GLOBALE;
 int adresseArgumentCourant;
 int adresseLocaleCourante;
 int cptPile = 0;
+int cptRegistre = 0;
+
 char* yyout = NULL;
 
 int getParamNumber(n_dec* n) {
@@ -195,7 +197,12 @@ void liWitchChar(char* reg, char* car, char* commentaire) {
 
 void li(char* reg, int val, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "\tli %s, %d", reg, val);
+    
+    if(strcmp(reg, "$t")
+        sprintf(buff, "\tli %s%d, %d", reg, cptRegistre, val);
+    else
+        sprintf(buff, "\tli %s, %d", reg, val);
+    
     ecrireFichier(buff, commentaire);
     free(buff);
 }
@@ -664,8 +671,9 @@ void symbole_opExp(n_exp *n)
 
 void symbole_intExp(n_exp *n)
 {
-    li("$t0", n->u.entier, NULL);
+    li("$t", n->u.entier, NULL);
     empiler("$t0");
+    cptRegistre++;
 }
 
 /*-------------------------------------------------------------------------*/
