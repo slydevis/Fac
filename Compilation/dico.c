@@ -121,6 +121,7 @@ void lw(char* reg, char* adr, char* commentaire);
 void divMIPS(char* regDest, char* reg1, char* reg2, char* commentaire);
 void mult(char* regDest, char* reg1, char* reg2, char* commentaire);
 void jal(char* label, char* commentaire);
+void move(char* reg, char* adr, char* commentaire);
 
 /*-------------------------------------------------------------------------*/
 
@@ -282,6 +283,15 @@ void jal(char* label, char* commentaire) {
 void jr(char* reg, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
     sprintf(buff, "\tjr %s", reg);
+    ecrireFichier(buff, commentaire);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void move(char* reg, char* adr, char* commentaire) {
+    char* buff = malloc(sizeof(char)*100);
+    sprintf(buff, "\tmove %s, %s", reg, adr);
     ecrireFichier(buff, commentaire);
     free(buff);
 }
@@ -475,17 +485,17 @@ void symbole_l_instr(n_l_instr *n)
 
 void symbole_instr(n_instr *n)
 {
-  if(n){
-    if(n->type == blocInst) symbole_l_instr(n->u.liste);
-    else if(n->type == affecteInst) symbole_instr_affect(n);
-    else if(n->type == siInst) symbole_instr_si(n);
-    else if(n->type == tantqueInst) symbole_instr_tantque(n);
-    else if(n->type == faireInst) symbole_instr_faire(n);
-    else if(n->type == pourInst) symbole_instr_pour(n);    
-    else if(n->type == appelInst) symbole_instr_appel(n);
-    else if(n->type == retourInst) symbole_instr_retour(n);
-    else if(n->type == ecrireInst) symbole_instr_ecrire(n);
-  }
+    if(n) {
+        if(n->type == blocInst) symbole_l_instr(n->u.liste);
+        else if(n->type == affecteInst) symbole_instr_affect(n);
+        else if(n->type == siInst) symbole_instr_si(n);
+        else if(n->type == tantqueInst) symbole_instr_tantque(n);
+        else if(n->type == faireInst) symbole_instr_faire(n);
+        else if(n->type == pourInst) symbole_instr_pour(n);    
+        else if(n->type == appelInst) symbole_instr_appel(n);
+        else if(n->type == retourInst) symbole_instr_retour(n);
+        else if(n->type == ecrireInst) symbole_instr_ecrire(n);
+    }
 }
 
 /*-------------------------------------------------------------------------*/
@@ -529,15 +539,20 @@ void symbole_instr_pour(n_instr *n)                /* MODIFIE POUR EVAL */
 
 void symbole_instr_affect(n_instr *n)
 {
-  symbole_var(n->u.affecte_.var);
-  symbole_exp(n->u.affecte_.exp);
+    symbole_var(n->u.affecte_.var);
+    symbole_exp(n->u.affecte_.exp);
+
+    depiler("$t1");
+    sw("$t1", n->u.affecte_.var->nom, NULL);
+    lw("$t1", n->u.affecte_.var->nom, "lit variable dans $t1");
+    empiler("$t1");
 }
 
 /*-------------------------------------------------------------------------*/
 
 void symbole_instr_appel(n_instr *n)
 {
-  symbole_appel(n->u.appel);
+    symbole_appel(n->u.appel);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -631,7 +646,8 @@ void symbole_opExp(n_exp *n)
 
 void symbole_intExp(n_exp *n)
 {
-    printf("ICI = AFFECT\n");
+    li("$t0", n->u.entier, NULL);
+    empiler("$t0");
 }
 
 /*-------------------------------------------------------------------------*/
@@ -696,6 +712,9 @@ void symbole_foncDec(n_dec *n)
     createLibelle(n->nom);
 
     entreeFonction();
+    empiler("$fp");
+    move("$fp", "$sp", NULL);
+    empiler("$ra");
     symbole_l_dec(n->u.foncDec_.param);
     symbole_l_dec(n->u.foncDec_.variables);
     symbole_instr(n->u.foncDec_.corps);
@@ -763,7 +782,6 @@ void symbole_var_simple(n_var *n)
         printf("La variable %s n'est pas daclaré\n", n->nom);
         exit(-1);
     }
-
   //affiche_element("var_simple", n->nom, 1);
 }
 
