@@ -198,6 +198,10 @@ void liWitchChar(char* reg, char* car, char* commentaire) {
 void li(char* reg, int val, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
     
+    if(cptRegistre >= 10) {
+        printf("Error trop de registre son utilisé\n");
+        exit(-1);
+    }
     if(strcmp(reg, "$t")
         sprintf(buff, "\tli %s%d, %d", reg, cptRegistre, val);
     else
