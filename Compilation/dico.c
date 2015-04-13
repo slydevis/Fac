@@ -219,7 +219,12 @@ void subi(char* regDest, char* reg, int value, char* commentaire) {
 
 void sw(char* reg, char* adr, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "\tsw %s 0(%s)", reg, adr);
+ 
+    if(strcmp(adr, "$sp") == 0)
+        sprintf(buff, "\tsw %s 0(%s)", reg, adr);
+    else
+        sprintf(buff, "\tsw %s %s", reg, adr);
+
     ecrireFichier(buff, commentaire);
     free(buff);
 }
@@ -246,7 +251,11 @@ void addi(char* reg, char* reg2, int val, char* commentaire) {
 
 void lw(char* reg, char* adr, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "\tlw %s 0(%s)", reg, adr);
+    if(strcmp(adr, "$sp") == 0)
+        sprintf(buff, "\tlw %s 0(%s)", reg, adr);
+    else
+        sprintf(buff, "\tlw %s %s", reg, adr);
+
     ecrireFichier(buff, commentaire);
     free(buff);
 }
