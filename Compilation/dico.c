@@ -50,6 +50,7 @@ void ecrireFichier(char* str, char* commentaire) {
 void printGlobalVariable() {
     FILE* fic = fopen(yyout, "a+");
 
+    int cpt = 0;
     if(fic != NULL) {
       int i;
       for(i = 0; i < dico.sommet; i++){
@@ -58,13 +59,15 @@ void printGlobalVariable() {
                     char* str = malloc(sizeof(char)*100);
                     sprintf(str, "%s:\t.space 4\n", dico.tab[i].identif);
                     fputs(str, fic);
-                    free(str);
+                    free(str);  
+                    cpt++;
                 }
                 else if(dico.tab[i].type == T_TABLEAU_ENTIER) {
                     char* str = malloc(sizeof(char)*100);
                     sprintf(str, "%s:\t.space %d\n", dico.tab[i].identif, 4*dico.tab[i].complement);
                     fputs(str, fic);
                     free(str);
+                    cpt++;
                 }
             }
         }
@@ -72,6 +75,8 @@ void printGlobalVariable() {
         fclose(fic);
     }
 
+    if(cpt != 0)
+        ecrireFichier("", NULL);
 }
 
 /*------------------------------------------------------------------------*/
@@ -107,10 +112,10 @@ void createLibelle(char* str) {
 /*-------------------------------------------------------------------------*/
 
 void li(char* reg, int val, char* commentaire);
-void sub(char* regDest, char* reg1, char* reg2, char* commentaire);
-void subu(char* regDest, char* reg, int value, char* commentaire);
-void add(char* regDest, char* reg1, char* reg2, char* commentaire);
-void addu(char* reg, char* reg2, int val, char* commentaire);
+void subu(char* regDest, char* reg1, char* reg2, char* commentaire);
+void subi(char* regDest, char* reg, int value, char* commentaire);
+void addu(char* regDest, char* reg1, char* reg2, char* commentaire);
+void addi(char* reg, char* reg2, int val, char* commentaire);
 void sw(char* reg, char* adr, char* commentaire);
 void lw(char* reg, char* adr, char* commentaire);
 void divMIPS(char* regDest, char* reg1, char* reg2, char* commentaire);
@@ -120,22 +125,66 @@ void jal(char* label, char* commentaire);
 /*-------------------------------------------------------------------------*/
 
 void empiler(char* reg) {
-    subu("$sp", "$sp", 4, "empile registre");
+    char* commentaire = malloc(sizeof(char)*100);
+    sprintf(commentaire, "empile registre : %s", reg);
+    subi("$sp", "$sp", 4, commentaire);
     sw(reg, "$sp", NULL);
+    free(commentaire);
 }
 
 /*-------------------------------------------------------------------------*/
 
 void depiler(char* reg) { 
-    lw(reg, "$sp", "depile vers registre");
-    addu("$sp", "$sp", 4, NULL);
+    char* commentaire = malloc(sizeof(char)*100);
+    sprintf(commentaire, "depile vers registre : %s", reg);
+    lw(reg, "$sp", commentaire);
+    addi("$sp", "$sp", 4, NULL);
+    free(commentaire);
 }
 
 /*-------------------------------------------------------------------------*/
 
-void syscall(int valeur, char* commentaire) {
+void syscall(int valeur) {
+    char* commentaire = malloc(sizeof(char)*100);
+
+    switch(valeur) {
+        case 1:
+            sprintf(commentaire, "print_int 1 integer $a0");
+            break;
+        case 4:
+            sprintf(commentaire, "print_string 4 $a0");
+            break;
+        case 5:
+            sprintf(commentaire, "read_int 5 integer (in $v0)");
+            break;
+        case 8:
+            sprintf(commentaire, "read_string 8 buf $a0, buflen $a1");
+            break;
+        case 9:
+            sprintf(commentaire, "sbrk 9 amount $a address (in $v0)");
+            break;
+        case 10:
+            sprintf(commentaire, "stoppe l'execution du processus");
+            break;
+        case 11:
+            sprintf(commentaire, "ecrire char");
+            break;
+        default:
+            commentaire = NULL;
+            break;
+    }
+
     li("$v0", valeur, NULL);
     ecrireFichier("\tsyscall", commentaire);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void liWitchChar(char* reg, char* car, char* commentaire) {
+    char* buff = malloc(sizeof(char)*100);
+    sprintf(buff, "\tli %s, '%s'", reg, car);
+    ecrireFichier(buff, commentaire);
+    free(buff);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -149,7 +198,7 @@ void li(char* reg, int val, char* commentaire) {
 
 /*-------------------------------------------------------------------------*/
 
-void sub(char* regDest, char* reg1, char* reg2, char* commentaire) {
+void subu(char* regDest, char* reg1, char* reg2, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
     sprintf(buff, "\tsub %s %s %s", regDest, reg1, reg2);
     ecrireFichier(buff, commentaire);
@@ -158,9 +207,9 @@ void sub(char* regDest, char* reg1, char* reg2, char* commentaire) {
 
 /*-------------------------------------------------------------------------*/
 
-void subu(char* regDest, char* reg, int value, char* commentaire) {
+void subi(char* regDest, char* reg, int value, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "\tsubu %s %s %d", regDest, reg, value);
+    sprintf(buff, "\tsubi %s %s %d", regDest, reg, value);
     ecrireFichier(buff, commentaire);
     free(buff);
 }
@@ -176,7 +225,7 @@ void sw(char* reg, char* adr, char* commentaire) {
 
 /*-------------------------------------------------------------------------*/
 
-void add(char* regDest, char* reg1, char* reg2, char* commentaire) {
+void addu(char* regDest, char* reg1, char* reg2, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
     sprintf(buff, "\tadd %s %s %s", regDest, reg1, reg2);
     ecrireFichier(buff, commentaire);
@@ -185,9 +234,9 @@ void add(char* regDest, char* reg1, char* reg2, char* commentaire) {
 
 /*-------------------------------------------------------------------------*/
 
-void addu(char* reg, char* reg2, int val, char* commentaire) {
+void addi(char* reg, char* reg2, int val, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "\taddu %s %s %d", reg, reg2, val);
+    sprintf(buff, "\taddi %s %s %d", reg, reg2, val);
     ecrireFichier(buff, commentaire);
     free(buff);
 }
@@ -228,6 +277,15 @@ void jal(char* label, char* commentaire) {
     free(buff);
 }
 
+/*-------------------------------------------------------------------------*/
+
+void jr(char* reg, char* commentaire) {
+    char* buff = malloc(sizeof(char)*100);
+    sprintf(buff, "\tjr %s", reg);
+    ecrireFichier(buff, commentaire);
+    free(buff);
+}
+ 
 /*-------------------------------------------------------------------------*/
 
 void entreeFonction(void){
@@ -379,18 +437,21 @@ void symbole_n_prog(n_prog *n)
     symbole_l_dec(n->variables);
     symbole_l_dec(n->fonctions); 
 
+    depiler("$ra");
+    depiler("$fp");
+    jr("$ra", NULL);
+
     sprintf(yyout, "%s.mips", yyin2);
 
     ecrireFichier("\t.data", NULL);
     printGlobalVariable();
-    ecrireFichier("", NULL);
 
     ecrireFichier("\t.text", NULL);
     createLibelle("__start");
     
     jal(dico.tab[getMain()].identif, NULL);
     
-    syscall(10, "stoppe l'execution du processus");
+    syscall(10);
 
     char* source = malloc(sizeof(char)*100);
     sprintf(source, "%s.out", yyin2);
@@ -507,6 +568,11 @@ void symbole_instr_retour(n_instr *n)
 void symbole_instr_ecrire(n_instr *n)
 {
   symbole_exp(n->u.ecrire_.expression);
+
+  depiler("$a0");
+  syscall(1);
+  liWitchChar("$a0", "\\n", NULL);
+  syscall(11);
 }
 
 /* -------------------------------------------------------------------------*/
@@ -547,9 +613,9 @@ void symbole_opExp(n_exp *n)
   symbole_exp(n->u.opExp_.op1);
   if( n->u.opExp_.op2 != NULL ) {
       if(n->u.opExp_.op == plus)
-        add("$t0", "$t0", "$t1", NULL);
+        addu("$t0", "$t0", "$t1", NULL);
       else if(n->u.opExp_.op == moins)
-        sub("$t0", "$t0", "$t1", NULL);
+        subu("$t0", "$t0", "$t1", NULL);
       else if(n->u.opExp_.op == divise)
         divMIPS("$t0", "$t0", "$t1", NULL);
       else if(n->u.opExp_.op == fois)
