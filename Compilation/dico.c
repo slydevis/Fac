@@ -287,7 +287,7 @@ void divMIPS(char* regDest, char* reg1, char* reg2, char* commentaire) {
 
 void mult(char* regDest, char* reg1, char* reg2, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "\tdiv %s %s %s", regDest, reg1, reg2);
+    sprintf(buff, "\tmult %s %s %s", regDest, reg1, reg2);
     ecrireFichier(buff, commentaire);
     free(buff);
 }
