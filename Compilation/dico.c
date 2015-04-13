@@ -202,7 +202,7 @@ void li(char* reg, int val, char* commentaire) {
         printf("Error trop de registre son utilisé\n");
         exit(-1);
     }
-    if(strcmp(reg, "$t")
+    if(strcmp(reg, "$t") == 0)
         sprintf(buff, "\tli %s%d, %d", reg, cptRegistre, val);
     else
         sprintf(buff, "\tli %s, %d", reg, val);
@@ -651,11 +651,16 @@ void symbole_varExp(n_exp *n)
 
 void symbole_opExp(n_exp *n)
 {
-  depiler("$t0");
-  depiler("$t1");
-
+  char* buff = malloc(sizeof(char)*100);
+  
   symbole_exp(n->u.opExp_.op1);
   if( n->u.opExp_.op2 != NULL ) {
+      if (cptRegistre == 0)
+      {
+        sprintf(buff, "\t$t%d", cptRegistre);
+        depiler(buff);
+      }
+      symbole_exp(n->u.opExp_.op2);
       if(n->u.opExp_.op == plus)
         addu("$t0", "$t0", "$t1", NULL);
       else if(n->u.opExp_.op == moins)
@@ -663,11 +668,9 @@ void symbole_opExp(n_exp *n)
       else if(n->u.opExp_.op == divise)
         divMIPS("$t0", "$t0", "$t1", NULL);
       else if(n->u.opExp_.op == fois)
-        mult("$t0", "$t0", "$t1", NULL);
-
-      symbole_exp(n->u.opExp_.op2);
+        mult("$t0", "$t0", "$t1", NULL);        
+      --cptRegistre;
   }
-  
   empiler("$t0");
 }
 
@@ -676,7 +679,7 @@ void symbole_opExp(n_exp *n)
 void symbole_intExp(n_exp *n)
 {
     li("$t", n->u.entier, NULL);
-    empiler("$t0");
+   /* empiler("$t0");*/
     cptRegistre++;
 }
 
