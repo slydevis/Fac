@@ -121,10 +121,11 @@ void addu(char* regDest, char* reg1, char* reg2, char* commentaire);
 void addi(char* reg, char* reg2, int val, char* commentaire);
 void sw(char* reg, char* adr, char* commentaire);
 void lw(char* reg, char* adr, char* commentaire);
-void divMIPS(char* regDest, char* reg1, char* reg2, char* commentaire);
-void mult(char* regDest, char* reg1, char* reg2, char* commentaire);
+void divMIPS(char* reg1, char* reg2, char* commentaire);
+void mult(char* reg1, char* reg2, char* commentaire);
 void jal(char* label, char* commentaire);
 void move(char* reg, char* adr, char* commentaire);
+void mflo(char* reg, char* commentaire);
 
 /*-------------------------------------------------------------------------*/
 
@@ -276,18 +277,18 @@ void lw(char* reg, char* adr, char* commentaire) {
 
 /*-------------------------------------------------------------------------*/
 
-void divMIPS(char* regDest, char* reg1, char* reg2, char* commentaire) {
+void divMIPS(char* reg1, char* reg2, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "\tdiv %s %s %s", regDest, reg1, reg2);
+    sprintf(buff, "\tdiv %s %s", reg1, reg2);
     ecrireFichier(buff, commentaire);
     free(buff);
 }
 
 /*-------------------------------------------------------------------------*/
 
-void mult(char* regDest, char* reg1, char* reg2, char* commentaire) {
+void mult(char* reg1, char* reg2, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "\tmult %s %s %s", regDest, reg1, reg2);
+    sprintf(buff, "\tmult %s %s", reg1, reg2);
     ecrireFichier(buff, commentaire);
     free(buff);
 }
@@ -319,6 +320,15 @@ void move(char* reg, char* adr, char* commentaire) {
     free(buff);
 }
  
+/*-------------------------------------------------------------------------*/
+
+void mflo(char* reg, char* commentaire) {
+    char* buff = malloc(sizeof(char)*100);
+    sprintf(buff, "\tmflo %s", reg);
+    ecrireFichier(buff, commentaire);
+    free(buff);
+}
+
 /*-------------------------------------------------------------------------*/
 
 void entreeFonction(void){
@@ -665,10 +675,14 @@ void symbole_opExp(n_exp *n)
         addu("$t0", "$t0", "$t1", NULL);
       else if(n->u.opExp_.op == moins)
         subu("$t0", "$t0", "$t1", NULL);
-      else if(n->u.opExp_.op == divise)
-        divMIPS("$t0", "$t0", "$t1", NULL);
-      else if(n->u.opExp_.op == fois)
-        mult("$t0", "$t0", "$t1", NULL);        
+      else if(n->u.opExp_.op == divise) {
+        divMIPS("$t0", "$t1", NULL);
+        mflo("$t0", NULL);
+      }
+      else if(n->u.opExp_.op == fois) {
+        mult("$t0", "$t1", NULL);        
+        mflo("$t0", NULL);
+      }
       --cptRegistre;
   }
   empiler("$t0");
