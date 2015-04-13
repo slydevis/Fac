@@ -7,6 +7,7 @@
 int contexte = C_VARIABLE_GLOBALE;
 int adresseArgumentCourant;
 int adresseLocaleCourante;
+int cptPile = 0;
 char* yyout = NULL;
 
 int getParamNumber(n_dec* n) {
@@ -126,6 +127,7 @@ void move(char* reg, char* adr, char* commentaire);
 /*-------------------------------------------------------------------------*/
 
 void empiler(char* reg) {
+    cptPile++;
     char* commentaire = malloc(sizeof(char)*100);
     sprintf(commentaire, "empile registre : %s", reg);
     subi("$sp", "$sp", 4, commentaire);
@@ -136,6 +138,7 @@ void empiler(char* reg) {
 /*-------------------------------------------------------------------------*/
 
 void depiler(char* reg) { 
+    cptPile--;
     char* commentaire = malloc(sizeof(char)*100);
     sprintf(commentaire, "depile vers registre : %s", reg);
     lw(reg, "$sp", commentaire);
@@ -455,6 +458,12 @@ void symbole_n_prog(n_prog *n)
 
     symbole_l_dec(n->variables);
     symbole_l_dec(n->fonctions); 
+
+    if(cptPile > 2) {
+        int i;
+        for(i = 0; i < cptPile; ++i)
+            depiler("$a0");
+    }
 
     depiler("$ra");
     depiler("$fp");
