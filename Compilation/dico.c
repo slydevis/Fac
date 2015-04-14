@@ -774,22 +774,40 @@ void symbole_opExp(n_exp *n)
         mflo("$t0", NULL);
       }
       else if(n->u.opExp_.op == inf) {
-        blt("$t0", "$t1", "e", NULL);
+        li("$t0", n->u.opExp_.op1->u.entier, NULL);
+        li("$t1", n->u.opExp_.op2->u.entier, NULL);
+        bgt("$t0", "$t1", "e", NULL);
+        return;
       }
       else if(n->u.opExp_.op == sup) {
-        bgt("$t0", "$t1", "e", NULL);
+        li("$t0", n->u.opExp_.op1->u.entier, NULL);
+        li("$t1", n->u.opExp_.op2->u.entier, NULL);
+        blt("$t0", "$t1", "e", NULL);
+        return;
       }
       else if(n->u.opExp_.op == infeg) {
+        li("$t0", n->u.opExp_.op1->u.entier, NULL);
+        li("$t1", n->u.opExp_.op2->u.entier, NULL);
         ble("$t0", "$t1", "e", NULL);
+        return;
       }
       else if(n->u.opExp_.op == supeg) {
+        li("$t0", n->u.opExp_.op1->u.entier, NULL);
+        li("$t1", n->u.opExp_.op2->u.entier, NULL);
         bge("$t0", "$t1", "e", NULL);
+        return;
       }
       else if(n->u.opExp_.op == non) {
+        li("$t0", n->u.opExp_.op1->u.entier, NULL);
+        li("$t1", n->u.opExp_.op2->u.entier, NULL);
         bne("$t0", "$t1", "e", NULL);
+        return;
       }
       else if(n->u.opExp_.op == egal) {
+        li("$t0", n->u.opExp_.op1->u.entier, NULL);
+        li("$t1", n->u.opExp_.op2->u.entier, NULL);
         beq("$t0", "$t1", "e", NULL);
+        return;
       }
       --cptRegistre;
   }
