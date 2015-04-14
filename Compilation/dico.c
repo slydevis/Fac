@@ -25,6 +25,19 @@ int getParamNumber(n_dec* n) {
     return i;
 }
 
+int getParamNumberAppel(n_appel* n) {
+    int i = 0;
+    n_l_exp* param = n->args;
+
+    while(param != NULL) {
+        param = param->queue;
+        ++i;
+    }
+
+    return i;
+}
+
+
 /*-------------------------------------------------------------------------*/
 
 void ecrireFichier(char* str, char* commentaire) {
@@ -697,6 +710,24 @@ void symbole_appel(n_appel *n)
     exit(-1);
   }
 
+  int res2 = getParamNumberAppel(n);
+  int numParam = 0;
+
+  int i;
+  for(i = 0; i < dico.sommet; ++i) {
+    if(strcmp(dico.tab[i].identif, n->fonction) == 0)
+    {
+        numParam = dico.tab[i].complement;
+        break;
+    }    
+  }
+
+  if(res2 != numParam)
+  {
+    printf("Mauvais nombre de paramètre\n");
+    exit(-1);
+  }
+
   symbole_l_exp(n->args);
 }
 
@@ -733,11 +764,16 @@ void symbole_l_exp(n_l_exp *n)
 
 void symbole_exp(n_exp *n)
 {
+  char* buff = malloc(sizeof(char)*100);
+
   if(n->type == varExp) symbole_varExp(n);
   else if(n->type == opExp) symbole_opExp(n);
   else if(n->type == intExp) symbole_intExp(n);
   else if(n->type == appelExp) symbole_appelExp(n);
   else if(n->type == lireExp) symbole_lireExp(n);
+
+  sprintf(buff, "$t%d", cptRegistre-1);
+  empiler(buff);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -756,6 +792,11 @@ void symbole_opExp(n_exp *n)
   symbole_exp(n->u.opExp_.op1);
   if( n->u.opExp_.op2 != NULL ) {
       symbole_exp(n->u.opExp_.op2);
+      if(cptPile > 2)
+      {            
+        /*sprintf(buff, "$t%d", cptRegistre-1);*/
+        depiler("$t0");
+      }
       if(n->u.opExp_.op == plus)
         addu("$t0", "$t0", "$t1", NULL);
       else if(n->u.opExp_.op == moins)
@@ -769,6 +810,15 @@ void symbole_opExp(n_exp *n)
         mflo("$t0", NULL);
       }
       else if(n->u.opExp_.op == inf) {
+        /*if(n->u.opExp_.op1->u->var.nom == NULL) 
+            li("$t0", n->u.opExp_.op1->u.var->nom, NULL);
+        else
+            lw("$t0", n->u.opExp_.op1->u.var.nom, NULL);
+*/
+ /*       if(n->u.opExp_.op2->u->var.nom == NULL) 
+            li("$t1", n->u.opExp_.op2->u.var.nom, NULL);
+        else
+            lw("$t1",*/
         li("$t0", n->u.opExp_.op1->u.entier, NULL);
         li("$t1", n->u.opExp_.op2->u.entier, NULL);
         bgt("$t0", "$t1", "e", NULL);
@@ -806,8 +856,6 @@ void symbole_opExp(n_exp *n)
       }
       --cptRegistre;
   }
-
-  empiler("$t0");
 }
 
 /*-------------------------------------------------------------------------*/
@@ -815,7 +863,7 @@ void symbole_opExp(n_exp *n)
 void symbole_intExp(n_exp *n)
 {
     li("$t", n->u.entier, NULL);
-    empiler("$t0");
+    /* empiler("$t0"); */
     cptRegistre++;
 }
 
@@ -933,6 +981,19 @@ void symbole_tabDec(n_dec *n)
 
 void symbole_var(n_var *n)
 {
+  int i;
+
+  for(i = 0; i< dico.sommet; ++i) {
+       if(strcmp(n->nom, dico.tab[i].identif) == 0) {
+            if(dico.tab[i].type == T_ENTIER && n->type != simple) {
+                exit(-1);
+            }
+            if(dico.tab[i].type == T_TABLEAU_ENTIER && n->type != indicee) {
+                exit(-1);
+            }
+            //exit(-1);
+        }
+  }
   if(n->type == simple) {
     symbole_var_simple(n);
   }
@@ -958,6 +1019,11 @@ void symbole_var_simple(n_var *n)
 
 void symbole_var_indicee(n_var *n)
 {
+
+/*    printf("Error\n");
+    exit(-1);
+*/
+
   //affiche_element("var_base_tableau", n->nom, 1);
   int res = rechercheExecutable(n->nom);
   

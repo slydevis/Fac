@@ -5,6 +5,7 @@
 #include "syntabs.h"
 
 extern int uniteCourante;
+extern int traceStatus;
 
 int premier[NB_NON_TERMINAUX + 1][NB_TERMINAUX + 1];
 int suivant[NB_NON_TERMINAUX + 1][NB_TERMINAUX + 1];
@@ -16,7 +17,7 @@ void printToken();
 int estPremier(int nonTerm, int term);
 int estSuivant(int nonTerm, int term);
 
-n_prog* PG(int trace);
+n_prog* PG();
 n_l_dec* ODV(void);
 n_l_dec* LDF(void);
 n_dec* DF(void);

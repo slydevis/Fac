@@ -60,6 +60,11 @@ void getValues(char * name) {
 }
 
 void consommer() {
+    if(traceStatus == 0) {
+        uniteCourante = yylex();        
+        return;
+    }
+
     indent();
     if(uniteCourante == ENTIER)
         printf("<mot_clef>entier</mot_clef>\n");
@@ -176,12 +181,8 @@ void affiche_balise_fermante(char*, int);
  * pg -> odv ldf #(1) programme -> optDecVariables listeDecFonctions
  */
 
-int traceStatus;
-
-n_prog* PG(int trace) {
-    int traceStatus = trace;
-    
-    affiche_balise_ouvrante("programme", 1);
+n_prog* PG() {    
+    affiche_balise_ouvrante("programme", traceStatus);
 
     n_l_dec* odv = NULL;
     n_l_dec* ldf = NULL;
@@ -197,14 +198,14 @@ n_prog* PG(int trace) {
     else if(estSuivant(_programme_, uniteCourante)) {
         odv = ODV();
         ldf = LDF();
-        affiche_balise_fermante("programme", 1);
+        affiche_balise_fermante("programme", traceStatus);
         return cree_n_prog(odv, ldf);
     }
     else {
        printError(__FUNCTION__, __LINE__);
     }
 
-    affiche_balise_fermante("programme", 1);
+    affiche_balise_fermante("programme", traceStatus);
 
     return cree_n_prog(odv, ldf);
 }
@@ -215,7 +216,7 @@ n_prog* PG(int trace) {
  */
 
 n_l_dec* ODV() {
-    affiche_balise_ouvrante("optDecVariables", 1);
+    affiche_balise_ouvrante("optDecVariables", traceStatus);
 
     n_l_dec* ldv = NULL;
 
@@ -228,14 +229,14 @@ n_l_dec* ODV() {
         consommer();
     }
     else if(estSuivant(_optDecVariables_, uniteCourante)) {
-        affiche_balise_fermante("optDecVariables", 1);
+        affiche_balise_fermante("optDecVariables", traceStatus);
         return ldv;
     }
     else {
         printError(__FUNCTION__, __LINE__);
     }
 
-    affiche_balise_fermante("optDecVariables", 1);
+    affiche_balise_fermante("optDecVariables", traceStatus);
 
     return ldv;
 }
@@ -245,7 +246,7 @@ n_l_dec* ODV() {
  */
 
 n_l_dec* LDV() {
-    affiche_balise_ouvrante("listeDecVariables", 1);
+    affiche_balise_ouvrante("listeDecVariables", traceStatus);
 
     n_dec* dv = NULL;
     n_l_dec* ldvb = NULL;
@@ -258,7 +259,7 @@ n_l_dec* LDV() {
         printError(__FUNCTION__, __LINE__);
     }
     
-    affiche_balise_fermante("listeDecVariables", 1);
+    affiche_balise_fermante("listeDecVariables", traceStatus);
     
     return cree_n_l_dec(dv, ldvb);
 }
@@ -269,7 +270,7 @@ n_l_dec* LDV() {
  */
 
 n_l_dec* LDVB() {
-    affiche_balise_ouvrante("listeDecVariablesBis", 1);
+    affiche_balise_ouvrante("listeDecVariablesBis", traceStatus);
 
     n_dec* dv = NULL;
     n_l_dec* ldvb = NULL;
@@ -281,12 +282,12 @@ n_l_dec* LDVB() {
         ldvb = LDVB();
     }
     else if(estSuivant(_listeDecVariablesBis_, uniteCourante)) {
-        affiche_balise_fermante("listeDecVariablesBis", 1);
+        affiche_balise_fermante("listeDecVariablesBis", traceStatus);
         return NULL;
     }
     else
         printError(__FUNCTION__, __LINE__);
-    affiche_balise_fermante("listeDecVariablesBis", 1);
+    affiche_balise_fermante("listeDecVariablesBis", traceStatus);
     return cree_n_l_dec(dv, ldvb);
 }
 
@@ -295,7 +296,7 @@ n_l_dec* LDVB() {
  */
 
 n_dec* DV() {
-    affiche_balise_ouvrante("declarationVariable", 1);
+    affiche_balise_ouvrante("declarationVariable", traceStatus);
 
     int ott = 0;
     char* nom = malloc(sizeof(char)*100);
@@ -314,7 +315,7 @@ n_dec* DV() {
         }
     }
     else { printError(__FUNCTION__, __LINE__); }
-    affiche_balise_fermante("declarationVariable", 1);
+    affiche_balise_fermante("declarationVariable", traceStatus);
 
     if(ott <= 0) { return cree_n_dec_var(nom); }
     
@@ -327,7 +328,7 @@ n_dec* DV() {
  */
 
 int OTT() {
-    affiche_balise_ouvrante("optTailleTableau", 1);
+    affiche_balise_ouvrante("optTailleTableau", traceStatus);
 
     int taille = 0;
     if(uniteCourante == CROCHET_OUVRANT)
@@ -351,13 +352,13 @@ int OTT() {
     }
     else if(estSuivant(_optTailleTableau_, uniteCourante))
     {
-        affiche_balise_fermante("optTailleTableau", 1);
+        affiche_balise_fermante("optTailleTableau", traceStatus);
         return taille;
     }
     else 
         printError(__FUNCTION__, __LINE__);
     
-    affiche_balise_fermante("optTailleTableau", 1);
+    affiche_balise_fermante("optTailleTableau", traceStatus);
 
     return taille;
 }
@@ -368,7 +369,7 @@ int OTT() {
  */
 
 n_l_dec* LDF() {
-    affiche_balise_ouvrante("listeDecFonctions", 1);
+    affiche_balise_ouvrante("listeDecFonctions", traceStatus);
     
     n_dec* df = NULL;
     n_l_dec* ldf = NULL;
@@ -378,13 +379,13 @@ n_l_dec* LDF() {
         ldf = LDF();
     }
     else if(estSuivant(_listeDecFonctions_, uniteCourante)) {
-        affiche_balise_fermante("listeDecFonctions", 1);
+        affiche_balise_fermante("listeDecFonctions", traceStatus);
         return NULL;
     }
     else
         printError(__FUNCTION__, __LINE__);
         
-    affiche_balise_fermante("listeDecFonctions", 1);
+    affiche_balise_fermante("listeDecFonctions", traceStatus);
 
     return cree_n_l_dec(df, ldf);
 }
@@ -394,7 +395,7 @@ n_l_dec* LDF() {
  */
 
 n_dec* DF() {
-    affiche_balise_ouvrante("declarationFonction", 1);
+    affiche_balise_ouvrante("declarationFonction", traceStatus);
 
     char* nom = malloc(sizeof(char)*100);
     n_l_dec* lp = NULL;
@@ -414,7 +415,7 @@ n_dec* DF() {
         printError(__FUNCTION__, __LINE__);
     }
     
-    affiche_balise_fermante("declarationFonction", 1);
+    affiche_balise_fermante("declarationFonction", traceStatus);
 
     return cree_n_dec_fonc(nom, lp, odv, ib);
 }
@@ -424,7 +425,7 @@ n_dec* DF() {
  */
 
 n_l_dec* LP() {
-    affiche_balise_ouvrante("listeParam", 1);
+    affiche_balise_ouvrante("listeParam", traceStatus);
     
     n_l_dec* oldv = NULL;
 
@@ -433,7 +434,7 @@ n_l_dec* LP() {
         oldv = OLDV();
         if(uniteCourante == PARENTHESE_FERMANTE) {
             consommer();
-            affiche_balise_fermante("listeParam", 1);
+            affiche_balise_fermante("listeParam", traceStatus);
             return oldv;
         }
         else
@@ -442,7 +443,7 @@ n_l_dec* LP() {
     else
         printError(__FUNCTION__, __LINE__);
     
-    affiche_balise_fermante("listeParam", 1);
+    affiche_balise_fermante("listeParam", traceStatus);
 
     return oldv;
 }
@@ -453,7 +454,7 @@ n_l_dec* LP() {
  */
 
 n_l_dec* OLDV() {
-    affiche_balise_ouvrante("optListeDecVariables", 1);
+    affiche_balise_ouvrante("optListeDecVariables", traceStatus);
 
     n_l_dec* ldv = NULL;
 
@@ -461,13 +462,13 @@ n_l_dec* OLDV() {
         ldv = LDV();
     }
     else if(estSuivant(_optListeDecVariables_, uniteCourante)) {
-        affiche_balise_fermante("optListeDecVariables", 1);
+        affiche_balise_fermante("optListeDecVariables", traceStatus);
         return NULL;
     }
     else
         printError(__FUNCTION__, __LINE__);
 
-    affiche_balise_fermante("optListeDecVariables", 1);
+    affiche_balise_fermante("optListeDecVariables", traceStatus);
 
     return ldv;
 }
@@ -484,7 +485,7 @@ n_l_dec* OLDV() {
  */
 
 n_instr* I() {
-    affiche_balise_ouvrante("instruction", 1);
+    affiche_balise_ouvrante("instruction", traceStatus);
 
     n_instr* i = NULL;
 
@@ -509,7 +510,7 @@ n_instr* I() {
     else
         printError(__FUNCTION__, __LINE__);
         
-    affiche_balise_fermante("instruction", 1);
+    affiche_balise_fermante("instruction", traceStatus);
 
     return i;
 }
@@ -519,7 +520,7 @@ n_instr* I() {
  */
 
 n_instr* IAFF() {
-    affiche_balise_ouvrante("instructionAffect", 1);
+    affiche_balise_ouvrante("instructionAffect", traceStatus);
     
     n_var* var = NULL;
     n_exp* exp = NULL;
@@ -543,7 +544,7 @@ n_instr* IAFF() {
         else 
             printError(__FUNCTION__, __LINE__);
     }
-    affiche_balise_fermante("instructionAffect", 1);
+    affiche_balise_fermante("instructionAffect", traceStatus);
 
     return cree_n_instr_affect(var, exp);
 }
@@ -553,7 +554,7 @@ n_instr* IAFF() {
  */
 
 n_instr* IB() {
-    affiche_balise_ouvrante("instructionBloc", 1);
+    affiche_balise_ouvrante("instructionBloc", traceStatus);
     
     n_l_instr* li = NULL;
     if(uniteCourante == ACCOLADE_OUVRANTE)
@@ -570,7 +571,7 @@ n_instr* IB() {
     }
     else
         printError(__FUNCTION__, __LINE__);
-    affiche_balise_fermante("instructionBloc", 1);
+    affiche_balise_fermante("instructionBloc", traceStatus);
 
     return cree_n_instr_bloc(li);
 }
@@ -581,7 +582,7 @@ n_instr* IB() {
  */
 
 n_l_instr* LI() {
-    affiche_balise_ouvrante("listeInstructions", 1);
+    affiche_balise_ouvrante("listeInstructions", traceStatus);
     
     n_instr* i;
     n_l_instr* li;
@@ -591,13 +592,13 @@ n_l_instr* LI() {
         li = LI();
     }
     else if(estSuivant(_listeInstructions_, uniteCourante)) {
-        affiche_balise_fermante("listeInstructions", 1);
+        affiche_balise_fermante("listeInstructions", traceStatus);
         return NULL;
     }
     else
         printError(__FUNCTION__, __LINE__);
         
-    affiche_balise_fermante("listeInstructions", 1);
+    affiche_balise_fermante("listeInstructions", traceStatus);
 
     return cree_n_l_instr(i, li);
 }
@@ -607,7 +608,7 @@ n_l_instr* LI() {
  */
  
 n_instr* IPOUR() {
-    affiche_balise_ouvrante("instructionPour", 1);
+    affiche_balise_ouvrante("instructionPour", traceStatus);
     
     n_instr* iaff = NULL;
     n_exp* exp = NULL; 
@@ -657,7 +658,7 @@ n_instr* IPOUR() {
     else
         printError(__FUNCTION__, __LINE__);
 
-    affiche_balise_fermante("instructionPour", 1);
+    affiche_balise_fermante("instructionPour", traceStatus);
 
     return cree_n_instr_pour(iaff, exp, iaff2, ib);
 }
@@ -668,7 +669,7 @@ n_instr* IPOUR() {
  */
 
 n_instr* ISI() {
-    affiche_balise_ouvrante("instructionSi", 1);
+    affiche_balise_ouvrante("instructionSi", traceStatus);
 
     n_exp* exp = NULL;
     n_instr* ib = NULL;
@@ -691,7 +692,7 @@ n_instr* ISI() {
     else
         printError(__FUNCTION__, __LINE__);
         
-    affiche_balise_fermante("instructionSi", 1);
+    affiche_balise_fermante("instructionSi", traceStatus);
 
     return cree_n_instr_si(exp, ib, osinon);
 }
@@ -702,7 +703,7 @@ n_instr* ISI() {
  */
 
 n_instr* OSINON() {
-    affiche_balise_ouvrante("optSinon", 1);
+    affiche_balise_ouvrante("optSinon", traceStatus);
     
     n_instr* ib = NULL;
 
@@ -712,13 +713,13 @@ n_instr* OSINON() {
         ib = IB();
     }
     else if(estSuivant(_optSinon_, uniteCourante)) {
-        affiche_balise_fermante("optSinon", 1);
+        affiche_balise_fermante("optSinon", traceStatus);
         return NULL;
     }
     else
         printError(__FUNCTION__, __LINE__);
         
-    affiche_balise_fermante("optSinon", 1);
+    affiche_balise_fermante("optSinon", traceStatus);
 
     return ib;
 }
@@ -728,7 +729,7 @@ n_instr* OSINON() {
  */
 
 n_instr* ITQ() {
-    affiche_balise_ouvrante("instructionTantque", 1);
+    affiche_balise_ouvrante("instructionTantque", traceStatus);
     
     n_exp* exp = NULL;
     n_instr* ib = NULL;
@@ -748,7 +749,7 @@ n_instr* ITQ() {
     else
         printError(__FUNCTION__, __LINE__);
 
-    affiche_balise_fermante("instructionTantque", 1);
+    affiche_balise_fermante("instructionTantque", traceStatus);
 
     return cree_n_instr_tantque(exp, ib);
 }
@@ -758,7 +759,7 @@ n_instr* ITQ() {
  */
 
 n_instr* IAPP() {
-    affiche_balise_ouvrante("instructionAppel", 1);
+    affiche_balise_ouvrante("instructionAppel", traceStatus);
     
     n_appel* appf = NULL;
     if(estPremier(_appelFct_, uniteCourante))
@@ -774,7 +775,7 @@ n_instr* IAPP() {
     else 
         printError(__FUNCTION__, __LINE__);
         
-    affiche_balise_fermante("instructionAppel", 1);
+    affiche_balise_fermante("instructionAppel", traceStatus);
 
     return cree_n_instr_appel(appf);
 }
@@ -784,7 +785,7 @@ n_instr* IAPP() {
  */
 
 n_instr* IRET() {
-    affiche_balise_ouvrante("instructionRetour", 1);
+    affiche_balise_ouvrante("instructionRetour", traceStatus);
     
     n_exp* exp = NULL;
 
@@ -800,7 +801,7 @@ n_instr* IRET() {
     else
         printError(__FUNCTION__, __LINE__);
         
-    affiche_balise_fermante("instructionRetour", 1);
+    affiche_balise_fermante("instructionRetour", traceStatus);
 
     return cree_n_instr_retour(exp);
 }
@@ -810,7 +811,7 @@ n_instr* IRET() {
  */
 
 n_instr* IECR() {
-    affiche_balise_ouvrante("instructionEcriture", 1);
+    affiche_balise_ouvrante("instructionEcriture", traceStatus);
     
     n_exp* exp = NULL;
 
@@ -837,7 +838,7 @@ n_instr* IECR() {
     else
         printError(__FUNCTION__, __LINE__);
         
-    affiche_balise_fermante("instructionEcriture", 1);
+    affiche_balise_fermante("instructionEcriture", traceStatus);
 
     return cree_n_instr_ecrire(exp);
 }
@@ -847,14 +848,14 @@ n_instr* IECR() {
  */
 
 n_instr* IVIDE() {
-    affiche_balise_ouvrante("instructionVide", 1);
+    affiche_balise_ouvrante("instructionVide", traceStatus);
     
     if(uniteCourante == POINT_VIRGULE)
         consommer();
     else
         printError(__FUNCTION__, __LINE__);
         
-    affiche_balise_fermante("instructionVide", 1);
+    affiche_balise_fermante("instructionVide", traceStatus);
 
     return cree_n_instr_vide();
 }
@@ -864,7 +865,7 @@ n_instr* IVIDE() {
  */
  
 n_exp* EXP() {
-    affiche_balise_ouvrante("expression", 1);
+    affiche_balise_ouvrante("expression", traceStatus);
 
     n_exp* conj = NULL;
     n_exp* expb = NULL;
@@ -877,7 +878,7 @@ n_exp* EXP() {
     else
         printError(__FUNCTION__, __LINE__);
         
-    affiche_balise_fermante("expression", 1);
+    affiche_balise_fermante("expression", traceStatus);
 
     if(expb == NULL) return conj;
 
@@ -890,7 +891,7 @@ n_exp* EXP() {
  */
  
 n_exp* EXPB(n_exp* conjPere) {
-    affiche_balise_ouvrante("expressionBis", 1);
+    affiche_balise_ouvrante("expressionBis", traceStatus);
 
     n_exp* conj = NULL;
     n_exp* expb = NULL;
@@ -906,13 +907,13 @@ n_exp* EXPB(n_exp* conjPere) {
     }
     else if(estSuivant(_expressionBis_, uniteCourante))
     {
-        affiche_balise_fermante("expressionBis", 1);
+        affiche_balise_fermante("expressionBis", traceStatus);
         return conjPere;
     }
     else
         printError(__FUNCTION__, __LINE__);
     
-    affiche_balise_fermante("expressionBis", 1);
+    affiche_balise_fermante("expressionBis", traceStatus);
 
     return expb;
 }
@@ -922,7 +923,7 @@ n_exp* EXPB(n_exp* conjPere) {
  */
  
  n_exp* CONJ() {
-     affiche_balise_ouvrante("conjonction", 1);
+     affiche_balise_ouvrante("conjonction", traceStatus);
      
      n_exp* neg = NULL;
      n_exp* conjb = NULL;
@@ -935,7 +936,7 @@ n_exp* EXPB(n_exp* conjPere) {
      else
         printError(__FUNCTION__, __LINE__);
         
-     affiche_balise_fermante("conjonction", 1);
+     affiche_balise_fermante("conjonction", traceStatus);
 
      if(conjb == NULL) return neg;
 
@@ -948,7 +949,7 @@ n_exp* EXPB(n_exp* conjPere) {
  */
  
 n_exp* CONJB(n_exp* negPere) {
-     affiche_balise_ouvrante("conjonctionBis", 1);
+     affiche_balise_ouvrante("conjonctionBis", traceStatus);
      
      n_exp* neg = NULL;
      n_exp* conjb = NULL;
@@ -962,13 +963,13 @@ n_exp* CONJB(n_exp* negPere) {
          conjb = CONJB(herite_fils);
      }
      else if(estSuivant(_conjonctionBis_, uniteCourante)) {
-        affiche_balise_fermante("conjonctionBis", 1);
+        affiche_balise_fermante("conjonctionBis", traceStatus);
         return negPere;
      }
      else
         printError(__FUNCTION__, __LINE__);
      
-     affiche_balise_fermante("conjonctionBis", 1);
+     affiche_balise_fermante("conjonctionBis", traceStatus);
  
      return conjb;
 }
@@ -979,14 +980,14 @@ n_exp* CONJB(n_exp* negPere) {
  */
  
  n_exp* NEG() {
-     affiche_balise_ouvrante("negation", 1);
+     affiche_balise_ouvrante("negation", traceStatus);
      
      n_exp* comp = NULL;
 
      if(uniteCourante == NON) {
         consommer();
         comp = COMP();
-        affiche_balise_fermante("negation", 1);
+        affiche_balise_fermante("negation", traceStatus);
 
         return cree_n_exp_op(non, comp, NULL);
      }
@@ -996,7 +997,7 @@ n_exp* CONJB(n_exp* negPere) {
      else
         printError(__FUNCTION__, __LINE__);
 
-    affiche_balise_fermante("negation", 1);
+    affiche_balise_fermante("negation", traceStatus);
     return comp;
  }
  
@@ -1005,7 +1006,7 @@ n_exp* CONJB(n_exp* negPere) {
  */
  
  n_exp* COMP() {
-     affiche_balise_ouvrante("comparaison", 1);
+     affiche_balise_ouvrante("comparaison", traceStatus);
      
      n_exp* e = NULL;
      n_exp* compb = NULL;
@@ -1018,7 +1019,7 @@ n_exp* CONJB(n_exp* negPere) {
      else
         printError(__FUNCTION__, __LINE__);
         
-     affiche_balise_fermante("comparaison", 1);
+     affiche_balise_fermante("comparaison", traceStatus);
 
      if(compb == NULL) return e;
 
@@ -1032,7 +1033,7 @@ n_exp* CONJB(n_exp* negPere) {
  */
  
 n_exp* COMPB(n_exp* herite) {
-    affiche_balise_ouvrante("comparaisonBis", 1);
+    affiche_balise_ouvrante("comparaisonBis", traceStatus);
      
     n_exp* e = NULL;
     n_exp* compb = NULL;
@@ -1051,13 +1052,13 @@ n_exp* COMPB(n_exp* herite) {
         compb = COMPB(herite_fils);
     }
     else if(estSuivant(_comparaisonBis_, uniteCourante)) {
-        affiche_balise_fermante("comparaisonBis", 1);
+        affiche_balise_fermante("comparaisonBis", traceStatus);
         return herite;
     }
     else
         printError(__FUNCTION__, __LINE__);
     
-    affiche_balise_fermante("comparaisonBis", 1);
+    affiche_balise_fermante("comparaisonBis", traceStatus);
     
     return compb;
 }
@@ -1067,7 +1068,7 @@ n_exp* COMPB(n_exp* herite) {
  */
  
 n_exp* E() {
-    affiche_balise_ouvrante("expArith", 1);
+    affiche_balise_ouvrante("expArith", traceStatus);
     
     n_exp* t = NULL;
     n_exp* eb = NULL;
@@ -1079,7 +1080,7 @@ n_exp* E() {
     else
         printError(__FUNCTION__, __LINE__);
         
-    affiche_balise_fermante("expArith", 1);
+    affiche_balise_fermante("expArith", traceStatus);
 
     if(eb == NULL) return t;
 
@@ -1092,7 +1093,7 @@ n_exp* E() {
  */
 
 n_exp* EB(n_exp* herite) {
-    affiche_balise_ouvrante("expArithBis", 1);
+    affiche_balise_ouvrante("expArithBis", traceStatus);
     
     n_exp* t = NULL;
     n_exp* eb = NULL;
@@ -1111,13 +1112,13 @@ n_exp* EB(n_exp* herite) {
         eb = EB(herite_fils);
     }
     else if(estSuivant(_expArithBis_, uniteCourante)) {
-        affiche_balise_fermante("expArithBis", 1);
+        affiche_balise_fermante("expArithBis", traceStatus);
         return herite;
     }
     else
         printError(__FUNCTION__, __LINE__);
         
-    affiche_balise_fermante("expArithBis", 1);
+    affiche_balise_fermante("expArithBis", traceStatus);
 
     return eb;
 }
@@ -1127,7 +1128,7 @@ n_exp* EB(n_exp* herite) {
  */
  
 n_exp* T() {
-    affiche_balise_ouvrante("terme", 1);
+    affiche_balise_ouvrante("terme", traceStatus);
     
     n_exp* f = NULL;
     n_exp* tb = NULL;
@@ -1139,7 +1140,7 @@ n_exp* T() {
     else
         printError(__FUNCTION__, __LINE__);
         
-    affiche_balise_fermante("terme", 1);
+    affiche_balise_fermante("terme", traceStatus);
 
     if(tb == NULL) return f;
 
@@ -1153,7 +1154,7 @@ n_exp* T() {
  */
 
 n_exp* TB(n_exp* fPere) {
-    affiche_balise_ouvrante("termeBis", 1);
+    affiche_balise_ouvrante("termeBis", traceStatus);
     
     n_exp* f = NULL;
     n_exp* tb = NULL;
@@ -1174,13 +1175,13 @@ n_exp* TB(n_exp* fPere) {
     }
     else if(estSuivant(_termeBis_, uniteCourante))
     {
-        affiche_balise_fermante("termeBis", 1);
+        affiche_balise_fermante("termeBis", traceStatus);
         return fPere;
     }
     else
         printError(__FUNCTION__, __LINE__);
         
-    affiche_balise_fermante("termeBis", 1);
+    affiche_balise_fermante("termeBis", traceStatus);
 
     return tb;
 }
@@ -1194,7 +1195,7 @@ n_exp* TB(n_exp* fPere) {
  */
  
 n_exp* F() {
-    affiche_balise_ouvrante("facteur", 1);
+    affiche_balise_ouvrante("facteur", traceStatus);
     
     n_exp* exp = NULL;
 
@@ -1203,7 +1204,7 @@ n_exp* F() {
         char* buff = malloc(sizeof(char)*100);
         getValues(buff);
         consommer();
-        affiche_balise_fermante("facteur", 1);
+        affiche_balise_fermante("facteur", traceStatus);
         return cree_n_exp_entier(atoi(buff));
     }
     else if(uniteCourante == PARENTHESE_OUVRANTE)
@@ -1225,7 +1226,7 @@ n_exp* F() {
             if(uniteCourante == PARENTHESE_FERMANTE)
             {
                 consommer();
-                affiche_balise_fermante("facteur", 1);
+                affiche_balise_fermante("facteur", traceStatus);
                 return cree_n_exp_lire();
             }
             else 
@@ -1236,18 +1237,18 @@ n_exp* F() {
     }
     else if(estPremier(_appelFct_, uniteCourante)) {
         n_appel* appf = APPF();
-        affiche_balise_fermante("facteur", 1);
+        affiche_balise_fermante("facteur", traceStatus);
         return cree_n_exp_appel(appf);
     }
     else if(estPremier(_var_, uniteCourante)) {
         n_var* var = VAR();
-        affiche_balise_fermante("facteur", 1);
+        affiche_balise_fermante("facteur", traceStatus);
         return cree_n_exp_var(var);
     }
     else
         printError(__FUNCTION__, __LINE__);
         
-    affiche_balise_fermante("facteur", 1);
+    affiche_balise_fermante("facteur", traceStatus);
 
     return exp;
 }
@@ -1257,7 +1258,7 @@ n_exp* F() {
  */
 
 n_var* VAR() {
-    affiche_balise_ouvrante("var", 1);
+    affiche_balise_ouvrante("var", traceStatus);
     
     char* nom = malloc(sizeof(char)*100);
     n_exp* oind = NULL;
@@ -1270,7 +1271,7 @@ n_var* VAR() {
     else
         printError(__FUNCTION__, __LINE__);
     
-    affiche_balise_fermante("var", 1);
+    affiche_balise_fermante("var", traceStatus);
 
     if(oind == NULL) { return cree_n_var_simple(nom); }
 
@@ -1283,7 +1284,7 @@ n_var* VAR() {
  */
  
 n_exp* OIND() {
-    affiche_balise_ouvrante("optIndice", 1);
+    affiche_balise_ouvrante("optIndice", traceStatus);
     
     n_exp* exp = NULL;
     
@@ -1299,13 +1300,13 @@ n_exp* OIND() {
     }
     else if(estSuivant(_optIndice_, uniteCourante))
     {
-        affiche_balise_fermante("optIndice", 1);
+        affiche_balise_fermante("optIndice", traceStatus);
         return NULL;
     }
     else
         printError(__FUNCTION__, __LINE__);
     
-    affiche_balise_fermante("optIndice", 1);
+    affiche_balise_fermante("optIndice", traceStatus);
 
     return exp;
 }
@@ -1315,7 +1316,7 @@ n_exp* OIND() {
  */
 
 n_appel* APPF() {
-    affiche_balise_ouvrante("appelFct", 1);
+    affiche_balise_ouvrante("appelFct", traceStatus);
     
     char* nom = malloc(sizeof(char)*100);
     n_l_exp* lexp = NULL;
@@ -1341,7 +1342,7 @@ n_appel* APPF() {
     else
         printError(__FUNCTION__, __LINE__);
             
-    affiche_balise_fermante("appelFct", 1);
+    affiche_balise_fermante("appelFct", traceStatus);
 
     return cree_n_appel(nom, lexp);
 }
@@ -1352,7 +1353,7 @@ n_appel* APPF() {
  */
 
 n_l_exp* LEXP() {
-    affiche_balise_ouvrante("listeExpressions", 1);
+    affiche_balise_ouvrante("listeExpressions", traceStatus);
     
     n_exp* exp = NULL;
     n_l_exp* lexpb = NULL;
@@ -1362,13 +1363,13 @@ n_l_exp* LEXP() {
         lexpb = LEXPB();
     }
     else if(estSuivant(_listeExpressions_, uniteCourante)) {
-        affiche_balise_fermante("listeExpressions", 1);
+        affiche_balise_fermante("listeExpressions", traceStatus);
         return NULL;
     }
     else
         printError(__FUNCTION__, __LINE__);
     
-    affiche_balise_fermante("listeExpressions", 1);
+    affiche_balise_fermante("listeExpressions", traceStatus);
 
     return cree_n_l_exp(exp, lexpb);
 }
@@ -1379,7 +1380,7 @@ n_l_exp* LEXP() {
  */
 
 n_l_exp* LEXPB() {
-    affiche_balise_ouvrante("listeExpressionsBis", 1);
+    affiche_balise_ouvrante("listeExpressionsBis", traceStatus);
     
     n_exp* exp = NULL;
     n_l_exp* lexpb = NULL;
@@ -1390,13 +1391,13 @@ n_l_exp* LEXPB() {
         lexpb = LEXPB();
     }
     else if(estSuivant(_listeExpressionsBis_, uniteCourante)) {
-        affiche_balise_fermante("listeExpressionsBis", 1);
+        affiche_balise_fermante("listeExpressionsBis", traceStatus);
         return NULL;
     }
     else
         printError(__FUNCTION__, __LINE__);
         
-    affiche_balise_fermante("listeExpressionsBis", 1);
+    affiche_balise_fermante("listeExpressionsBis", traceStatus);
 
     return cree_n_l_exp(exp, lexpb);
 }
