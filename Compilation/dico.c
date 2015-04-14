@@ -480,12 +480,11 @@ void symbole_n_prog(n_prog *n)
     symbole_l_dec(n->variables);
     symbole_l_dec(n->fonctions); 
 
-    if(cptPile > 2) {
-        int i;
-        for(i = 0; i < cptPile; ++i)
-            depiler("$a0");
+    while(cptPile > 2)
+    {
+      depiler("$a0");
     }
-
+    
     depiler("$ra");
     depiler("$fp");
     jr("$ra", NULL);
