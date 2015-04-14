@@ -176,7 +176,11 @@ void affiche_balise_fermante(char*, int);
  * pg -> odv ldf #(1) programme -> optDecVariables listeDecFonctions
  */
 
-n_prog* PG(void) {
+int traceStatus;
+
+n_prog* PG(int trace) {
+    int traceStatus = trace;
+    
     affiche_balise_ouvrante("programme", 1);
 
     n_l_dec* odv = NULL;

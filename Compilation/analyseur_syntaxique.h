@@ -16,7 +16,7 @@ void printToken();
 int estPremier(int nonTerm, int term);
 int estSuivant(int nonTerm, int term);
 
-n_prog* PG(void);
+n_prog* PG(int trace);
 n_l_dec* ODV(void);
 n_l_dec* LDF(void);
 n_dec* DF(void);

@@ -33,12 +33,14 @@ int main(int argc, char **argv) {
 
     init();
 
-    n_prog* pg = PG();
+    int trace;
+    
+    n_prog* pg = PG(trace);
 
     printf("\nArbre abstrait ====>\n\n");
     affiche_n_prog(pg);
-    printf("\nTable des symboles ======>\n\n");
-    symbole_n_prog(pg);
+    /*printf("\nTable des symboles ======>\n\n");
+    symbole_n_prog(pg);*/
     affiche_dico();
     return 0;
 }
