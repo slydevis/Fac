@@ -9,6 +9,7 @@ int adresseArgumentCourant;
 int adresseLocaleCourante;
 int cptPile = 0;
 int cptRegistre = 0;
+int cptLibelle = 0;
 
 char* yyout = NULL;
 
@@ -107,9 +108,13 @@ void copyFile(char* source, char* dest) {
 
 void createLibelle(char* str) {
     char* buff = malloc(sizeof(char)*100);
-    sprintf(buff, "%s:", str);
+    if(strcmp(str, "e") == 0)
+        sprintf(buff, "%s%d:", str, cptLibelle);
+    else 
+        sprintf(buff, "%s:", str);
     ecrireFichier(buff, NULL);
     free(buff);    
+
 }
 
 /*-------------------------------------------------------------------------*/
@@ -126,6 +131,12 @@ void mult(char* reg1, char* reg2, char* commentaire);
 void jal(char* label, char* commentaire);
 void move(char* reg, char* adr, char* commentaire);
 void mflo(char* reg, char* commentaire);
+void blt(char* reg, char* reg2, char* label, char* commentaire);
+void bgt(char* reg, char* reg2, char* label, char* commentaire);
+void ble(char* reg, char* reg2, char* label, char* commentaire);
+void bge(char* reg, char* reg2, char* label, char* commentaire);
+void bne(char* reg, char* reg2, char* label, char* commentaire);
+void beq(char* reg, char* reg2, char* label, char* commentaire);
 
 /*-------------------------------------------------------------------------*/
 
@@ -217,6 +228,84 @@ void li(char* reg, int val, char* commentaire) {
 void subu(char* regDest, char* reg1, char* reg2, char* commentaire) {
     char* buff = malloc(sizeof(char)*100);
     sprintf(buff, "\tsub %s %s %s", regDest, reg1, reg2);
+    ecrireFichier(buff, commentaire);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void blt(char* reg, char* reg2, char* label, char* commentaire) {
+    char* buff = malloc(sizeof(char)*100);
+    if(strcmp(label, "e") == 0)
+        sprintf(buff,"\tblt %s %s %s%d", reg, reg2, label, cptLibelle);
+    else
+        sprintf(buff, "\tblt %s %s %s", reg, reg2, label);
+    
+    ecrireFichier(buff, commentaire);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void bgt(char* reg, char* reg2, char* label, char* commentaire) {
+    char* buff = malloc(sizeof(char)*100);
+    if(strcmp(label, "e") == 0)
+        sprintf(buff,"\tbgt %s %s %s%d", reg, reg2, label, cptLibelle);
+    else
+        sprintf(buff, "\tbgt %s %s %s", reg, reg2, label);
+    
+    ecrireFichier(buff, commentaire);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void ble(char* reg, char* reg2, char* label, char* commentaire) {
+    char* buff = malloc(sizeof(char)*100);
+    if(strcmp(label, "e") == 0)
+        sprintf(buff,"\tble %s %s %s%d", reg, reg2, label, cptLibelle);
+    else
+        sprintf(buff, "\tble %s %s %s", reg, reg2, label);
+    
+    ecrireFichier(buff, commentaire);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void bge(char* reg, char* reg2, char* label, char* commentaire) {
+    char* buff = malloc(sizeof(char)*100);
+    if(strcmp(label, "e") == 0)
+        sprintf(buff,"\tbge %s %s %s%d", reg, reg2, label, cptLibelle);
+    else
+        sprintf(buff, "\tbge %s %s %s", reg, reg2, label);
+    
+    ecrireFichier(buff, commentaire);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void bne(char* reg, char* reg2, char* label, char* commentaire) {
+    char* buff = malloc(sizeof(char)*100);
+    if(strcmp(label, "e") == 0)
+        sprintf(buff,"\tbne %s %s %s%d", reg, reg2, label, cptLibelle);
+    else
+        sprintf(buff, "\tbne %s %s %s", reg, reg2, label);
+    
+    ecrireFichier(buff, commentaire);
+    free(buff);
+}
+
+/*-------------------------------------------------------------------------*/
+
+void beq(char* reg, char* reg2, char* label, char* commentaire) {
+    char* buff = malloc(sizeof(char)*100);
+    if(strcmp(label, "e") == 0)
+        sprintf(buff,"\tbeq %s %s %s%d", reg, reg2, label, cptLibelle);
+    else
+        sprintf(buff, "\tbeq %s %s %s", reg, reg2, label);
+    
     ecrireFichier(buff, commentaire);
     free(buff);
 }
@@ -545,6 +634,8 @@ void symbole_instr_si(n_instr *n)
   if(n->u.si_.sinon){
     symbole_instr(n->u.si_.sinon);
   }
+
+  createLibelle("e");
 }
 
 /*-------------------------------------------------------------------------*/
@@ -682,8 +773,27 @@ void symbole_opExp(n_exp *n)
         mult("$t0", "$t1", NULL);        
         mflo("$t0", NULL);
       }
+      else if(n->u.opExp_.op == inf) {
+        blt("$t0", "$t1", "e", NULL);
+      }
+      else if(n->u.opExp_.op == sup) {
+        bgt("$t0", "$t1", "e", NULL);
+      }
+      else if(n->u.opExp_.op == infeg) {
+        ble("$t0", "$t1", "e", NULL);
+      }
+      else if(n->u.opExp_.op == supeg) {
+        bge("$t0", "$t1", "e", NULL);
+      }
+      else if(n->u.opExp_.op == non) {
+        bne("$t0", "$t1", "e", NULL);
+      }
+      else if(n->u.opExp_.op == egal) {
+        beq("$t0", "$t1", "e", NULL);
+      }
       --cptRegistre;
   }
+
   empiler("$t0");
 }
 
@@ -692,7 +802,7 @@ void symbole_opExp(n_exp *n)
 void symbole_intExp(n_exp *n)
 {
     li("$t", n->u.entier, NULL);
-   /* empiler("$t0");*/
+    empiler("$t0");
     cptRegistre++;
 }
 
