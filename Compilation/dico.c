@@ -755,11 +755,6 @@ void symbole_opExp(n_exp *n)
   
   symbole_exp(n->u.opExp_.op1);
   if( n->u.opExp_.op2 != NULL ) {
-      if (cptRegistre == 0)
-      {
-        sprintf(buff, "\t$t%d", cptRegistre);
-        depiler(buff);
-      }
       symbole_exp(n->u.opExp_.op2);
       if(n->u.opExp_.op == plus)
         addu("$t0", "$t0", "$t1", NULL);
